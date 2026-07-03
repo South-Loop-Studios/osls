@@ -1,0 +1,6 @@
+layout: "9.1.6-wide"
+file: layouts/9.1.6-wide.osls
+channels: 16
+lfe: [LFE1]
+orderings:
+  adm: [M+030, M-030, M+000, LFE1, M+090, M-090, M+135, M-135, M+060, M-060, U+045, U-045, U+090, U-090, U+135, U-135]

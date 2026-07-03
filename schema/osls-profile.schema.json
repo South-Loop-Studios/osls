@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://osls.orbitspatial.io/schema/osls-profile.schema.json",
+  "title": "OSLS format profile",
+  "description": "A per-delivery-format channel-order lookup, keyed by BS.2051 sp label.",
+  "type": "object",
+  "required": ["format", "status"],
+  "additionalProperties": true,
+  "properties": {
+    "format": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "name": { "type": "string" },
+    "status": { "enum": ["normative", "stub"] },
+    "note": { "type": "string" },
+    "encodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["spec"],
+        "properties": { "spec": { "type": "string" }, "version": { "type": "string" } }
+      }
+    },
+    "layouts": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["order"],
+        "additionalProperties": true,
+        "properties": {
+          "code": { "type": "object" },
+          "since": { "type": "string" },
+          "order": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "oneOf": [
+                { "type": "string" },
+                {
+                  "type": "object",
+                  "required": ["sp"],
+                  "additionalProperties": false,
+                  "properties": { "sp": { "type": "string" }, "label": { "type": "string" } }
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

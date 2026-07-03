@@ -1,0 +1,239 @@
+// Unit tests: conversions, parsing, queries, and validation rejection.
+#include <cmath>
+#include <string>
+
+#include "check.hpp"
+#include "osls/osls.h"
+#include "osls/osls.hpp"
+
+void run_blessed_tests();  // defined in test_blessed.cpp
+
+namespace {
+
+bool approx(double a, double b, double eps = 1e-3) { return std::fabs(a - b) <= eps; }
+
+void test_conversions() {
+    using namespace osls;
+    Vec3 c = polarToCartesian({30, 0, 1});
+    CHECK(approx(c.x, -0.5) && approx(c.y, 0.866) && approx(c.z, 0.0));
+    c = polarToCartesian({90, 0, 1});
+    CHECK(approx(c.x, -1.0) && approx(c.y, 0.0));
+    c = polarToCartesian({45, 45, 1});
+    CHECK(approx(c.x, -0.5) && approx(c.y, 0.5) && approx(c.z, 0.707));
+    // round trip
+    Polar p = cartesianToPolar({-0.5, 0.866, 0.0});
+    CHECK(approx(p.az, 30) && approx(p.el, 0) && approx(p.dist, 1.0));
+}
+
+void test_parse() {
+    using namespace osls;
+    const char* text =
+        "osls: 1\n"
+        "id: \"demo\"\n"
+        "name: \"Demo\"\n"
+        "tags: [a, b]\n"
+        "speakers:\n"
+        "  - { id: L, label: L, sp: M+030, x: -0.5, y: 0.866, z: 0.0, az: 30, el: 0 }\n"
+        "  - { id: C, label: C, sp: M+000, az: 0, el: 0 }\n"
+        "  - { id: LFE, label: LFE, sp: LFE1, x: 0.0, y: 1.0, z: -0.5, lfe: true }\n"
+        "orderings:\n"
+        "  adm:  [L, C, LFE]\n"
+        "  iamf: [L, LFE, C]\n";
+    Layout L = Layout::loadString(text);
+    CHECK(L.id == "demo" && L.name == "Demo");
+    CHECK(L.tags.size() == 2 && L.tags[0] == "a");
+    CHECK(L.channelCount() == 3);
+    CHECK(L.speakers[2].lfe);
+    CHECK(L.lfeIndices().size() == 1 && L.lfeIndices()[0] == 2);
+    // C carried polar only -> Cartesian normalised in.
+    CHECK(approx(L.speakers[1].cartesian.y, 1.0) && approx(L.speakers[1].cartesian.x, 0.0));
+    // emit polar for an x/y/z-only speaker
+    Polar p = L.speakers[0].polar();
+    CHECK(approx(p.az, 30) && approx(p.el, 0));
+    auto adm = L.orderForSpec("adm");
+    CHECK(adm.size() == 3 && adm[0] == 0 && adm[1] == 1 && adm[2] == 2);
+    auto iamf = L.orderForSpec("iamf");
+    CHECK(iamf[1] == 2 && iamf[2] == 1);
+    auto nat = L.orderForSpec("native");
+    CHECK(nat.size() == 3 && nat[0] == 0);
+}
+
+void test_queries() {
+    using namespace osls;
+    Layout L = Layout::loadFile(std::string(OSLS_REPO_ROOT) + "/layouts/7.1.4.osls");
+    CHECK(L.channelCount() == 12);
+    // alias resolution: "Ls" is an alias of Lss
+    const Speaker* s = L.resolve("Ls");
+    CHECK_MSG(s && s->id == "Lss", "resolve alias Ls -> Lss");
+    // resolve by sp
+    CHECK(L.resolve("M+000") && L.resolve("M+000")->id == "C");
+    // IAMF moves C to index 1
+    auto iamf = L.orderForSpec("iamf");
+    CHECK(L.speakers[iamf[1]].id == "C");
+    // ADM keeps L,R,C,LFE up front
+    auto adm = L.orderForSpec("adm");
+    CHECK(L.speakers[adm[0]].id == "L" && L.speakers[adm[3]].id == "LFE");
+    CHECK(L.specs().size() >= 3);  // native + adm + iamf
+}
+
+void test_c_abi() {
+    char err[256] = {0};
+    osls_layout* h = osls_load_file((std::string(OSLS_REPO_ROOT) + "/layouts/5.1.osls").c_str(), err, sizeof err);
+    CHECK_MSG(h != nullptr, std::string("C ABI load 5.1: ") + err);
+    if (h) {
+        CHECK(osls_channel_count(h) == 6);
+        CHECK(std::string(osls_id(h)) == "5.1");
+        int order[16];
+        int n = osls_order_for_spec(h, "iamf", order, 16);
+        CHECK(n == 6);
+        CHECK(std::string(osls_speaker_id(h, order[5])) == "LFE");  // IAMF: LFE last
+        CHECK(osls_order_for_spec(h, "nope", order, 16) == -1);
+        int li = osls_resolve(h, "M+110");
+        CHECK(li >= 0 && std::string(osls_speaker_id(h, li)) == "Ls");
+        double a, b, c;
+        CHECK(osls_speaker_position(h, 0, OSLS_CARTESIAN, &a, &b, &c) == 1);
+        osls_free(h);
+    }
+}
+
+void test_c_abi_build() {
+    char err[256] = {0};
+    osls_layout* b = osls_new();
+    osls_set_id(b, "c-built");
+    osls_set_name(b, "C Built");
+    osls_set_vendor(b, "com.example");
+    osls_add_tag(b, "custom");
+    int i0 = osls_add_speaker(b, "L", "L", "M+030", 0, OSLS_CARTESIAN, -0.5, 0.866, 0);
+    osls_add_speaker(b, "C", nullptr, "M+000", 0, OSLS_POLAR, 0, 0, 1);  // label defaults to id
+    osls_add_speaker(b, "LFE", "LFE", "LFE1", 1, OSLS_CARTESIAN, 0, 1, -0.5);
+    osls_speaker_add_alias(b, i0, "FL");
+    const char* ids[] = {"L", "C", "LFE"};
+    osls_set_ordering(b, "adm", ids, 3);
+
+    char* yaml = osls_to_yaml(b, OSLS_AS_AUTHORED, err, sizeof err);
+    CHECK_MSG(yaml != nullptr, std::string("C ABI to_yaml: ") + err);
+    if (yaml) {
+        osls_layout* r = osls_load_string(yaml, err, sizeof err);  // round-trips + validates
+        CHECK_MSG(r != nullptr, std::string("reload built yaml: ") + err);
+        if (r) {
+            CHECK(osls_channel_count(r) == 3);
+            CHECK(std::string(osls_vendor(r)) == "com.example");
+            CHECK(osls_tag_count(r) == 1 && std::string(osls_tag(r, 0)) == "custom");
+            CHECK(osls_spec_count(r) == 1 && std::string(osls_spec_name(r, 0)) == "adm");
+            CHECK(osls_speaker_alias_count(r, 0) == 1 && std::string(osls_speaker_alias(r, 0, 0)) == "FL");
+            CHECK(std::string(osls_speaker_label(r, 1)) == "C");  // defaulted from id
+            osls_free(r);
+        }
+        osls_string_free(yaml);
+    }
+    // invalid build (no speakers) -> to_yaml fails cleanly
+    osls_layout* bad = osls_new();
+    osls_set_id(bad, "x");
+    osls_set_name(bad, "x");
+    CHECK(osls_to_yaml(bad, OSLS_AS_AUTHORED, err, sizeof err) == nullptr);
+    osls_free(bad);
+    osls_free(b);
+}
+
+void test_order_api() {
+    using namespace osls;
+    Layout L = Layout::loadFile(std::string(OSLS_REPO_ROOT) + "/layouts/7.1.4.osls");
+    // order() returns speakers in channel order
+    auto iamf = L.order(Spec::IAMF);
+    CHECK(iamf.size() == 12 && iamf[1].id == "C");        // IAMF: C at index 1
+    auto adm = L.order("adm");                            // string overload
+    CHECK(adm[0].id == "L" && adm[3].id == "LFE");
+    // friendly resolver
+    CHECK(L.speaker("Ls") && L.speaker("Ls")->id == "Lss");
+    CHECK(L.order(Spec::Native).size() == 12);
+}
+
+void test_build_and_emit() {
+    using namespace osls;
+    Layout L;
+    L.id = "my-room";
+    L.name = "My Room";
+    L.vendor = "com.example";
+    L.speakers = {
+        Speaker::cartesianAt("L", "M+030", {-0.5, 0.866, 0}),
+        Speaker::polarAt("C", "M+000", 0, 0),
+        Speaker::lfeAt("LFE", "LFE1", {0, 1, -0.5}),
+    };
+    L.orderings["adm"] = {"L", "C", "LFE"};  // ids -> OrderingEntry
+
+    // Serialise (validates) then parse back: lossless round trip.
+    Layout R = Layout::loadString(L.toYAML());
+    CHECK(R.id == "my-room" && R.vendor == "com.example");
+    CHECK(R.channelCount() == 3);
+    CHECK(R.speaker("C") && R.speaker("C")->id == "C");
+    CHECK(approx(R.speaker("C")->cartesian.y, 1.0));  // polar-authored normalised
+    CHECK(R.lfeIndices().size() == 1);
+    auto adm = R.order(Spec::ADM);
+    CHECK(adm.size() == 3 && adm[2].id == "LFE");
+
+    // Emitting an invalid layout throws instead of writing junk.
+    Layout bad;
+    bad.id = "x";
+    bad.name = "x";  // no speakers
+    bool threw = false;
+    try {
+        bad.toYAML();
+    } catch (const ParseError&) {
+        threw = true;
+    }
+    CHECK_MSG(threw, "toYAML must reject invalid layouts");
+}
+
+void expect_reject(const std::string& what, const char* text) {
+    using namespace osls;
+    bool threw = false;
+    try {
+        Layout::loadString(text);
+    } catch (const ParseError&) {
+        threw = true;
+    }
+    CHECK_MSG(threw, "expected rejection: " + what);
+}
+
+void test_negative() {
+    expect_reject("missing speakers",
+                  "osls: 1\nid: x\nname: x\n");
+    expect_reject("duplicate id",
+                  "osls: 1\nid: x\nname: x\nspeakers:\n"
+                  "  - { id: L, label: L, x: 0, y: 1, z: 0 }\n"
+                  "  - { id: L, label: L2, x: 1, y: 0, z: 0 }\n");
+    expect_reject("cartesian/polar disagree",
+                  "osls: 1\nid: x\nname: x\nspeakers:\n"
+                  "  - { id: L, label: L, x: -1.0, y: 0.0, z: 0.0, az: 30, el: 0 }\n");
+    expect_reject("ordering not a permutation",
+                  "osls: 1\nid: x\nname: x\nspeakers:\n"
+                  "  - { id: L, label: L, x: -0.5, y: 0.866, z: 0 }\n"
+                  "  - { id: R, label: R, x: 0.5, y: 0.866, z: 0 }\n"
+                  "orderings:\n  adm: [L, L]\n");
+    expect_reject("shared sp",
+                  "osls: 1\nid: x\nname: x\nspeakers:\n"
+                  "  - { id: A, label: A, sp: M+030, x: -0.5, y: 0.866, z: 0 }\n"
+                  "  - { id: B, label: B, sp: M+030, x: 0.5, y: 0.866, z: 0 }\n");
+    expect_reject("no position",
+                  "osls: 1\nid: x\nname: x\nspeakers:\n  - { id: L, label: L }\n");
+}
+
+}  // namespace
+
+int main() {
+    test_conversions();
+    test_parse();
+    test_queries();
+    test_order_api();
+    test_build_and_emit();
+    test_c_abi();
+    test_c_abi_build();
+    test_negative();
+    run_blessed_tests();
+    if (check::failures) {
+        std::cerr << check::failures << " check(s) failed\n";
+        return 1;
+    }
+    std::cout << "all checks passed\n";
+    return 0;
+}

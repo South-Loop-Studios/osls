@@ -1,0 +1,30 @@
+# Build output
+build/
+*/build/
+cmake-build-*/
+
+# Node / WASM build output
+node_modules/
+sdk/wasm/dist/
+*.tgz
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Swift build output
+.build/
+
+# Editor / OS
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+# Claude Code local
+.claude/
+
+# Internal design doc — not for the public repo
+docs/DESIGN.md

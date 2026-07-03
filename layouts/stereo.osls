@@ -1,0 +1,10 @@
+osls: 1
+id: "stereo"
+name: "Stereo (2.0)"
+description: "Standard two-channel stereo, front L/R at ±30°."
+vendor: io.orbitspatial
+tags: [stereo]
+frame: egocentric
+speakers:
+  - { id: L, label: L, sp: M+030, x: -0.5, y: 0.866, z: 0.0 }
+  - { id: R, label: R, sp: M-030, x:  0.5, y: 0.866, z: 0.0 }

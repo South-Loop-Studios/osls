@@ -1,0 +1,14 @@
+osls: 1
+id: "3.1.2"
+name: "3.1.2"
+description: "Front-only immersive (soundbar) layout: L/C/R + LFE + 2 top-front (Ltf/Rtf at U±45). The IAMF/soundbar 3.1.2; heights are top-front (not top-middle) by convention for this front-oriented layout. Same rig, ADM and IAMF orderings."
+vendor: io.orbitspatial
+tags: [immersive, soundbar]
+frame: egocentric
+speakers:
+  - { id: L,   label: L,   sp: M+030, x: -0.5, y:  0.866, z: 0.0 }
+  - { id: R,   label: R,   sp: M-030, x:  0.5, y:  0.866, z: 0.0 }
+  - { id: C,   label: C,   sp: M+000, x:  0.0, y:  1.0,   z: 0.0 }
+  - { id: LFE, label: LFE, sp: LFE1,  x:  0.0, y:  1.0,   z: -0.5, lfe: true }
+  - { id: Ltf, label: Ltf, sp: U+045, x: -0.5, y:  0.5,   z: 0.707 }
+  - { id: Rtf, label: Rtf, sp: U-045, x:  0.5, y:  0.5,   z: 0.707 }

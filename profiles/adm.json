@@ -1,0 +1,24 @@
+{
+  "format": "adm",
+  "name": "Audio Definition Model (ITU-R BS.2076-3)",
+  "status": "normative",
+  "encodes": [{ "spec": "ITU-R BS.2076", "version": "3" }],
+  "selfDescribing": true,
+  "note": "ADM carries per-channel position in-file, so READING ADM needs no profile order. These are the standard bed WRITE orders (LFE early). Read identity comes from the in-file speakerLabel/position; modeled on the ITU/EBU common definitions.",
+  "layouts": {
+    "mono":         { "order": ["M+000"] },
+    "stereo":       { "order": ["M+030", "M-030"] },
+    "quad":         { "order": ["M+030", "M-030", "M+110", "M-110"] },
+    "classic-quad": { "order": ["M+045", "M-045", "M+135", "M-135"] },
+    "3.1.2":        { "order": ["M+030", "M-030", "M+000", "LFE1", "U+045", "U-045"] },
+    "5.1":          { "order": ["M+030", "M-030", "M+000", "LFE1", "M+110", "M-110"] },
+    "5.1.2":        { "order": ["M+030", "M-030", "M+000", "LFE1", "M+110", "M-110", "U+090", "U-090"] },
+    "5.1.4":        { "order": ["M+030", "M-030", "M+000", "LFE1", "M+110", "M-110", "U+045", "U-045", "U+135", "U-135"] },
+    "7.1":          { "order": ["M+030", "M-030", "M+000", "LFE1", "M+090", "M-090", "M+135", "M-135"] },
+    "7.1.2":        { "order": ["M+030", "M-030", "M+000", "LFE1", "M+090", "M-090", "M+135", "M-135", "U+090", "U-090"] },
+    "7.1.4":        { "order": ["M+030", "M-030", "M+000", "LFE1", "M+090", "M-090", "M+135", "M-135", "U+045", "U-045", "U+135", "U-135"] },
+    "7.1.6":        { "order": ["M+030", "M-030", "M+000", "LFE1", "M+090", "M-090", "M+135", "M-135", "U+045", "U-045", "U+090", "U-090", "U+135", "U-135"] },
+    "9.1.4":        { "order": ["M+030", "M-030", "M+000", "LFE1", "M+090", "M-090", "M+135", "M-135", "M+060", "M-060", "U+045", "U-045", "U+135", "U-135"] },
+    "9.1.6-wide":   { "order": ["M+030", "M-030", "M+000", "LFE1", "M+090", "M-090", "M+135", "M-135", "M+060", "M-060", "U+045", "U-045", "U+090", "U-090", "U+135", "U-135"] }
+  }
+}

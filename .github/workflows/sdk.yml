@@ -1,0 +1,44 @@
+name: sdk
+
+# Builds osls-core (C++17) with GCC and Clang and runs its CTest suite, which
+# loads every blessed layout and checks each against its conformance fixture
+# (the C++ mirror of the Python conformance gate). Triggers when SDK sources or
+# the layouts/fixtures they consume change.
+
+on:
+  push:
+    branches: ["**"]
+    paths:
+      - "sdk/**"
+      - "layouts/**"
+      - "tests/conformance/**"
+      - "profiles/**"
+      - "sdk/core/scripts/**"
+      - ".github/workflows/sdk.yml"
+  pull_request:
+    paths:
+      - "sdk/**"
+      - "layouts/**"
+      - "tests/conformance/**"
+      - "profiles/**"
+      - "sdk/core/scripts/**"
+      - ".github/workflows/sdk.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [g++, clang++]
+    env:
+      CXX: ${{ matrix.compiler }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S sdk/core -B build -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build -j
+      - name: Test
+        run: ctest --test-dir build --output-on-failure

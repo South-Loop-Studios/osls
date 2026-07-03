@@ -1,0 +1,20 @@
+osls: 1
+id: "7.1.4"
+name: "7.1.4"
+description: "7.1.4 home immersive layout (7 ear-level + LFE + 4 overhead). ITU-R BS.2051 System J. Same rig, ADM and IAMF orderings. Carries both Cartesian and polar positions (validator-checked equal)."
+vendor: io.orbitspatial
+tags: [home, immersive]
+frame: egocentric   # listener-relative (BS.2051 angles, on the unit sphere). Speakers carry both Cartesian x/y/z and polar az/el.
+speakers:   # x/y/z = Orbit's authoritative vectors; az/el = the same points (az positive = left). The two agree within ε.
+  - { id: L,   label: L,   sp: M+030, x: -0.5,   y:  0.866, z: 0.0,   az:   30, el:  0 }
+  - { id: R,   label: R,   sp: M-030, x:  0.5,   y:  0.866, z: 0.0,   az:  -30, el:  0 }
+  - { id: C,   label: C,   sp: M+000, x:  0.0,   y:  1.0,   z: 0.0,   az:    0, el:  0 }
+  - { id: LFE, label: LFE, sp: LFE1,  x:  0.0,   y:  1.0,   z: -0.5,  lfe: true }
+  - { id: Lss, label: Lss, sp: M+090, x: -1.0,   y:  0.0,   z: 0.0,   az:   90, el:  0, aliases: [Ls] }
+  - { id: Rss, label: Rss, sp: M-090, x:  1.0,   y:  0.0,   z: 0.0,   az:  -90, el:  0, aliases: [Rs] }
+  - { id: Lrs, label: Lrs, sp: M+135, x: -0.707, y: -0.707, z: 0.0,   az:  135, el:  0, aliases: [Lsr] }
+  - { id: Rrs, label: Rrs, sp: M-135, x:  0.707, y: -0.707, z: 0.0,   az: -135, el:  0, aliases: [Rsr] }
+  - { id: Ltf, label: Ltf, sp: U+045, x: -0.5,   y:  0.5,   z: 0.707, az:   45, el: 45 }
+  - { id: Rtf, label: Rtf, sp: U-045, x:  0.5,   y:  0.5,   z: 0.707, az:  -45, el: 45 }
+  - { id: Ltb, label: Ltb, sp: U+135, x: -0.5,   y: -0.5,   z: 0.707, az:  135, el: 45, aliases: [Ltr] }
+  - { id: Rtb, label: Rtb, sp: U-135, x:  0.5,   y: -0.5,   z: 0.707, az: -135, el: 45, aliases: [Rtr] }

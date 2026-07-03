@@ -1,0 +1,39 @@
+{
+  "name": "@orbitspatial/osls-core",
+  "version": "0.4.0",
+  "description": "Pure-TypeScript engine for the Orbit Speaker Layout System (.osls): parse, validate, serialize, geometry, and ITU-R BS.2051 SP-labels.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "embed:presets": "node scripts/embed-presets.mjs",
+    "build": "npm run embed:presets && tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "npm run embed:presets && vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "ajv": "^8.17.1",
+    "yaml": "^2.6.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^3.0.0"
+  }
+}

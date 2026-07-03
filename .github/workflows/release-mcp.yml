@@ -1,0 +1,29 @@
+name: release-mcp
+
+# On an `mcp-v*` tag: build + publish @orbitspatial/osls-mcp to npm. It bundles
+# @orbitspatial/osls-core (tsup noExternal), so the published package is self-contained
+# and `npx @orbitspatial/osls-mcp` works. Needs the NPM_TOKEN repo secret. The tag is the
+# version source (must match sdk/mcp/package.json's version).
+
+on:
+  push:
+    tags: ["mcp-v*"]
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+      - name: Build + publish @orbitspatial/osls-mcp
+        working-directory: sdk/mcp
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          npm ci
+          npm run build
+          npm publish

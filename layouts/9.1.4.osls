@@ -1,0 +1,22 @@
+osls: 1
+id: "9.1.4"
+name: "9.1.4"
+description: "9.1.4 home immersive layout (14 ch): 7.1.4 + front wides (Lw/Rw at M±60). ITU-R BS.2051 System G. NOTE: this 9.x adds front wides; IAMF's expanded 9.x uses a different speaker set (centre-fill) and would be a separate file. ADM ordering only."
+vendor: io.orbitspatial
+tags: [home, immersive, wide]
+frame: egocentric
+speakers:
+  - { id: L,   label: L,   sp: M+030, x: -0.5,   y:  0.866, z: 0.0 }
+  - { id: R,   label: R,   sp: M-030, x:  0.5,   y:  0.866, z: 0.0 }
+  - { id: C,   label: C,   sp: M+000, x:  0.0,   y:  1.0,   z: 0.0 }
+  - { id: LFE, label: LFE, sp: LFE1,  x:  0.0,   y:  1.0,   z: -0.5, lfe: true }
+  - { id: Lss, label: Lss, sp: M+090, x: -1.0,   y:  0.0,   z: 0.0, aliases: [Ls] }
+  - { id: Rss, label: Rss, sp: M-090, x:  1.0,   y:  0.0,   z: 0.0, aliases: [Rs] }
+  - { id: Lrs, label: Lrs, sp: M+135, x: -0.707, y: -0.707, z: 0.0, aliases: [Lsr] }
+  - { id: Rrs, label: Rrs, sp: M-135, x:  0.707, y: -0.707, z: 0.0, aliases: [Rsr] }
+  - { id: Lw,  label: Lw,  sp: M+060, x: -0.866, y:  0.5,   z: 0.0 }
+  - { id: Rw,  label: Rw,  sp: M-060, x:  0.866, y:  0.5,   z: 0.0 }
+  - { id: Ltf, label: Ltf, sp: U+045, x: -0.5,   y:  0.5,   z: 0.707 }
+  - { id: Rtf, label: Rtf, sp: U-045, x:  0.5,   y:  0.5,   z: 0.707 }
+  - { id: Ltb, label: Ltb, sp: U+135, x: -0.5,   y: -0.5,   z: 0.707, aliases: [Ltr] }
+  - { id: Rtb, label: Rtb, sp: U-135, x:  0.5,   y: -0.5,   z: 0.707, aliases: [Rtr] }

@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://osls.orbitspatial.io/schema/osls.schema.json",
+  "title": "OSLS layout (.osls)",
+  "description": "Orbit Speaker Layout System — a single loudspeaker layout. See docs/SPEC.md. Structural validation only; the SDK additionally enforces semantic rules (Cartesian/polar consistency when both are given, ordering completeness, identity sanity, LFE rules).",
+  "type": "object",
+  "required": ["osls", "id", "name", "speakers"],
+  "additionalProperties": false,
+  "properties": {
+    "osls": { "type": "integer", "const": 1, "description": "Spec major version." },
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$", "description": "Stable layout identifier (kebab/dotted)." },
+    "name": { "type": "string", "minLength": 1 },
+    "description": { "type": "string" },
+    "vendor": { "type": "string", "description": "Reverse-DNS namespace for custom layouts (e.g. io.orbitspatial)." },
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "frame": { "enum": ["allocentric", "egocentric"], "description": "The layout's reference frame: egocentric (listener-relative — speakers on a sphere at BS.2051 angles) or allocentric (room-anchored — positions in a normalized cube). Independent of whether positions are stored as Cartesian x/y/z or polar az/el; advisory, sets a visual editor's default view." },
+    "speakers": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/speaker" }
+    },
+    "aliases": {
+      "type": "object",
+      "description": "Layout-level true-alias map: canonical id -> [alias, ...].",
+      "additionalProperties": { "type": "array", "items": { "type": "string" } }
+    },
+    "orderings": {
+      "type": "object",
+      "description": "spec name -> channel order. Each value is a permutation of the speaker ids.",
+      "additionalProperties": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "oneOf": [
+            { "type": "string", "description": "speaker id" },
+            {
+              "type": "object",
+              "description": "speaker id with a spec-specific label override",
+              "required": ["speaker"],
+              "additionalProperties": false,
+              "properties": {
+                "speaker": { "type": "string" },
+                "label": { "type": "string" }
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  "$defs": {
+    "speaker": {
+      "type": "object",
+      "required": ["id", "label"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "description": "Layout-local stable key referenced by orderings." },
+        "label": { "type": "string", "minLength": 1, "description": "Short display label (canonical vocabulary)." },
+        "sp": { "type": "string", "description": "ITU-R BS.2051 SP-label, the cross-vendor identity (e.g. M+090, U+045, T+000, LFE1)." },
+        "lfe": { "type": "boolean", "default": false },
+        "aliases": { "type": "array", "items": { "type": "string" } },
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "z": { "type": "number" },
+        "az": { "type": "number", "description": "Azimuth deg: 0=front, positive=listener left." },
+        "el": { "type": "number", "description": "Elevation deg: positive=up." },
+        "dist": { "type": "number", "default": 1.0, "description": "Polar distance (unit sphere = 1.0)." }
+      },
+      "anyOf": [
+        { "required": ["x", "y", "z"], "title": "Cartesian" },
+        { "required": ["az", "el"], "title": "Polar" }
+      ],
+      "comment": "A speaker MUST carry at least one complete position: Cartesian (x,y,z) and/or polar (az,el[,dist]). Both is allowed. JSON Schema enforces 'at least one complete set'; the SDK validator additionally enforces that, when both are given, they resolve to the same point within tolerance."
+    }
+  }
+}

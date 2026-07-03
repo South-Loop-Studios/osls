@@ -1,0 +1,14 @@
+osls: 1
+id: "5.1"
+name: "5.1"
+description: "ITU-R BS.2051 System B. Single surround pair at ±110°."
+vendor: io.orbitspatial
+tags: [surround]
+frame: egocentric
+speakers:
+  - { id: L,   label: L,   sp: M+030, x: -0.5,  y:  0.866, z: 0.0 }
+  - { id: R,   label: R,   sp: M-030, x:  0.5,  y:  0.866, z: 0.0 }
+  - { id: C,   label: C,   sp: M+000, x:  0.0,  y:  1.0,   z: 0.0 }
+  - { id: LFE, label: LFE, sp: LFE1,  x:  0.0,  y:  1.0,   z: -0.5, lfe: true }
+  - { id: Ls,  label: Ls,  sp: M+110, x: -0.94, y: -0.342, z: 0.0 }
+  - { id: Rs,  label: Rs,  sp: M-110, x:  0.94, y: -0.342, z: 0.0 }

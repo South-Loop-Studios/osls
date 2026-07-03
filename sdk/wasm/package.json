@@ -1,0 +1,28 @@
+{
+  "name": "@orbitspatial/osls-core-wasm",
+  "version": "0.1.0",
+  "description": "WebAssembly build of osls-core — read and author OSLS speaker layouts in the browser or Node.",
+  "type": "module",
+  "main": "dist/osls.js",
+  "types": "dist/osls.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/osls.d.ts",
+      "default": "./dist/osls.js"
+    }
+  },
+  "scripts": {
+    "build:wasm": "bash build.sh",
+    "build:ts": "tsc",
+    "build": "npm run build:wasm && npm run build:ts",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test test/"
+  },
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,4 @@
+# Dependencies for the interim OSLS validation/conformance gate (tests/validate.py).
+# Superseded by osls-core (C++17) at roadmap P1; kept minimal until then.
+PyYAML>=6.0
+jsonschema>=4.0

@@ -1,0 +1,9 @@
+osls: 1
+id: "mono"
+name: "Mono"
+description: "Single centre channel."
+vendor: io.orbitspatial
+tags: [legacy]
+frame: egocentric
+speakers:
+  - { id: C, label: C, sp: M+000, x: 0.0, y: 1.0, z: 0.0 }

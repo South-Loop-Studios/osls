@@ -1,0 +1,43 @@
+name: conformance
+
+# Validates every blessed .osls layout against the JSON Schema and the SPEC §4
+# semantic rules, and checks each against its conformance fixture. Gates every
+# push and PR so a layout with a wrong channel order, an inconsistent
+# Cartesian/polar position, or a missing fixture fails the build.
+
+on:
+  push:
+    branches: ["**"]
+    paths:
+      - "layouts/**"
+      - "schema/**"
+      - "tests/**"
+      - "profiles/**"
+      - "sdk/core/scripts/**"
+      - ".github/workflows/conformance.yml"
+  pull_request:
+    paths:
+      - "layouts/**"
+      - "schema/**"
+      - "tests/**"
+      - "profiles/**"
+      - "sdk/core/scripts/**"
+      - ".github/workflows/conformance.yml"
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generated C++ profiles are in sync
+        run: |
+          node sdk/core/scripts/gen-profiles.mjs
+          git diff --exit-code sdk/core/src/profiles.generated.hpp sdk/core/src/profiles.generated.cpp
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: python -m pip install --upgrade pip -r tests/requirements.txt
+      - name: Validate layouts + conformance fixtures
+        run: python tests/validate.py

@@ -1,0 +1,6 @@
+layout: "classic-quad"
+file: layouts/classic-quad.osls
+channels: 4
+lfe: []
+orderings:
+  adm: [M+045, M-045, M+135, M-135]

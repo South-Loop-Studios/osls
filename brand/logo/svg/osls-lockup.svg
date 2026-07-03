@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 429 130" width="429" height="130" fill="none">
+<defs></defs>
+<circle cx="52" cy="65" r="45" stroke="#16181D" stroke-width="3.5"></circle>
+<circle cx="52.000" cy="20.000" r="9" fill="#2B62F0"></circle>
+<circle cx="90.971" cy="87.500" r="9" fill="#16181D"></circle>
+<circle cx="13.029" cy="87.500" r="9" fill="#16181D"></circle>
+<line x1="132" y1="28" x2="132" y2="102" stroke="#E6E8EC" stroke-width="1"></line>
+<text x="164" y="78" font-family="Space Grotesk, sans-serif" font-weight="600" font-size="56" letter-spacing="-0.84" fill="#16181D">OSLS</text>
+<text x="164.5" y="99" font-family="IBM Plex Mono, monospace" font-weight="500" font-size="12" letter-spacing="2.4" fill="#9AA0AB">ORBIT SPEAKER LAYOUT SYSTEM</text>
+</svg>

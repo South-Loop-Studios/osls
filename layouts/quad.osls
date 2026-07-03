@@ -1,0 +1,12 @@
+osls: 1
+id: "quad"
+name: "Quad (4.0)"
+description: "Quadraphonic 4.0: front L/R at ±30 and surround Ls/Rs at ±110, no centre, no LFE (i.e. 5.1 minus C and LFE). BS.2051-clean positions; classic 1970s quadraphonic used a ±45/±135 corner square instead."
+vendor: io.orbitspatial
+tags: [quad, legacy, surround]
+frame: egocentric
+speakers:
+  - { id: L,  label: L,  sp: M+030, x: -0.5,  y:  0.866, z: 0.0 }
+  - { id: R,  label: R,  sp: M-030, x:  0.5,  y:  0.866, z: 0.0 }
+  - { id: Ls, label: Ls, sp: M+110, x: -0.94, y: -0.342, z: 0.0 }
+  - { id: Rs, label: Rs, sp: M-110, x:  0.94, y: -0.342, z: 0.0 }

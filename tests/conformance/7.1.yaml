@@ -1,0 +1,7 @@
+layout: "7.1"
+file: layouts/7.1.osls
+channels: 8
+lfe: [LFE1]
+orderings:
+  adm:  [M+030, M-030, M+000, LFE1, M+090, M-090, M+135, M-135]
+  iamf: [M+030, M+000, M-030, M+090, M-090, M+135, M-135, LFE1]

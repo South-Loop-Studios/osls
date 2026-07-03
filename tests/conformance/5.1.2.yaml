@@ -1,0 +1,7 @@
+layout: "5.1.2"
+file: layouts/5.1.2.osls
+channels: 8
+lfe: [LFE1]
+orderings:
+  adm:  [M+030, M-030, M+000, LFE1, M+110, M-110, U+090, U-090]
+  iamf: [M+030, M+000, M-030, M+110, M-110, U+090, U-090, LFE1]

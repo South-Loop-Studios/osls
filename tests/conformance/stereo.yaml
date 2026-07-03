@@ -1,0 +1,7 @@
+layout: "stereo"
+file: layouts/stereo.osls
+channels: 2
+lfe: []
+orderings:
+  adm:  [M+030, M-030]
+  iamf: [M+030, M-030]

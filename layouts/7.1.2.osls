@@ -1,0 +1,18 @@
+osls: 1
+id: "7.1.2"
+name: "7.1.2"
+description: "7.1 + 2 overhead (top-middle Ltm/Rtm at U±90). Split side (±90) and rear (±135) surrounds. Same rig, ADM and IAMF orderings."
+vendor: io.orbitspatial
+tags: [home, immersive]
+frame: egocentric
+speakers:
+  - { id: L,   label: L,   sp: M+030, x: -0.5,   y:  0.866, z: 0.0 }
+  - { id: R,   label: R,   sp: M-030, x:  0.5,   y:  0.866, z: 0.0 }
+  - { id: C,   label: C,   sp: M+000, x:  0.0,   y:  1.0,   z: 0.0 }
+  - { id: LFE, label: LFE, sp: LFE1,  x:  0.0,   y:  1.0,   z: -0.5, lfe: true }
+  - { id: Lss, label: Lss, sp: M+090, x: -1.0,   y:  0.0,   z: 0.0, aliases: [Ls] }
+  - { id: Rss, label: Rss, sp: M-090, x:  1.0,   y:  0.0,   z: 0.0, aliases: [Rs] }
+  - { id: Lrs, label: Lrs, sp: M+135, x: -0.707, y: -0.707, z: 0.0, aliases: [Lsr] }
+  - { id: Rrs, label: Rrs, sp: M-135, x:  0.707, y: -0.707, z: 0.0, aliases: [Rsr] }
+  - { id: Ltm, label: Ltm, sp: U+090, x: -0.707, y:  0.0,   z: 0.707, aliases: [TpSiL] }
+  - { id: Rtm, label: Rtm, sp: U-090, x:  0.707, y:  0.0,   z: 0.707, aliases: [TpSiR] }

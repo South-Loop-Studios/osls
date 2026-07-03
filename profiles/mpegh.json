@@ -1,0 +1,7 @@
+{
+  "format": "mpegh",
+  "name": "MPEG-H 3D Audio",
+  "status": "stub",
+  "note": "Spec not yet incorporated; channel orders to be transcribed from ISO/IEC 23008-3.",
+  "layouts": {}
+}

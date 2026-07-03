@@ -1,0 +1,11 @@
+OSLS — Orbit Speaker Layout System
+Copyright 2026 South Loop Studios Limited
+
+Licensed under the Apache License, Version 2.0 (the "License"); see the LICENSE
+file. This covers the entire project: the specification, the JSON Schema, the
+blessed `.osls` layout files, the reference SDK, and the tools.
+
+"OSLS", "Orbit Speaker Layout System", and the ".osls" file extension are marks
+of South Loop Studios Limited. The Apache-2.0 license grants no trademark rights —
+you may implement the format freely, but do not distribute a fork named OSLS or
+otherwise use the marks to imply endorsement.

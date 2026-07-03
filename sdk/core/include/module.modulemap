@@ -1,0 +1,6 @@
+// Swift sees only the C ABI (osls.h). osls.hpp stays out of the module so the
+// import is pure C; the C++ sources still include it via the header path.
+module COSLSCore {
+    header "osls/osls.h"
+    export *
+}

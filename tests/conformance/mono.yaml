@@ -1,0 +1,7 @@
+layout: "mono"
+file: layouts/mono.osls
+channels: 1
+lfe: []
+orderings:
+  adm:  [M+000]
+  iamf: [M+000]

@@ -1,0 +1,19 @@
+{
+  "format": "iamf",
+  "name": "Immersive Audio Model and Formats",
+  "status": "normative",
+  "encodes": [{ "spec": "IAMF", "version": "1.1.0" }, { "spec": "IAMF", "version": "2.0.0" }],
+  "note": "loudspeaker_layout channel orders. LFE is last in every layout. Orders sourced from IAMF v1.1.0 §3.6 (Orbit/Docs/IAMF_V1.1.0_spec.md).",
+  "layouts": {
+    "mono":   { "order": ["M+000"] },
+    "stereo": { "order": ["M+030", "M-030"] },
+    "3.1.2":  { "order": ["M+030", "M+000", "M-030", "U+045", "U-045", "LFE1"] },
+    "5.1":    { "order": ["M+030", "M+000", "M-030", "M+110", "M-110", "LFE1"] },
+    "5.1.2":  { "order": ["M+030", "M+000", "M-030", "M+110", "M-110", "U+090", "U-090", "LFE1"] },
+    "5.1.4":  { "order": ["M+030", "M+000", "M-030", "M+110", "M-110", "U+045", "U-045", "U+135", "U-135", "LFE1"] },
+    "7.1":    { "order": ["M+030", "M+000", "M-030", "M+090", "M-090", "M+135", "M-135", "LFE1"] },
+    "7.1.2":  { "order": ["M+030", "M+000", "M-030", "M+090", "M-090", "M+135", "M-135", "U+090", "U-090", "LFE1"] },
+    "7.1.4":  { "order": ["M+030", "M+000", "M-030", "M+090", "M-090", "M+135", "M-135", "U+045", "U-045", "U+135", "U-135", "LFE1"] },
+    "7.1.6":  { "order": ["M+030", "M+000", "M-030", "M+090", "M-090", "M+135", "M-135", "U+045", "U-045", "U+090", "U-090", "U+135", "U-135", "LFE1"] }
+  }
+}

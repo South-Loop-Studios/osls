@@ -1,0 +1,39 @@
+name: wasm
+
+# Compiles osls-core to WebAssembly and runs the @orbitspatial/osls-core facade's Node test
+# suite (which loads every blessed layout and round-trips build->emit->reparse).
+# Runs in the Emscripten image, which ships emcc + node + npm.
+
+on:
+  push:
+    branches: ["**"]
+    paths:
+      - "sdk/**"
+      - "layouts/**"
+      - "profiles/**"
+      - "sdk/core/scripts/**"
+      - ".github/workflows/wasm.yml"
+  pull_request:
+    paths:
+      - "sdk/**"
+      - "layouts/**"
+      - "profiles/**"
+      - "sdk/core/scripts/**"
+      - ".github/workflows/wasm.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: emscripten/emsdk:3.1.64
+    defaults:
+      run:
+        working-directory: sdk/wasm
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dev dependencies
+        run: npm install
+      - name: Build (wasm + TypeScript)
+        run: npm run build
+      - name: Test
+        run: npm test

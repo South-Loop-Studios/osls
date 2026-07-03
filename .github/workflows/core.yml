@@ -1,0 +1,42 @@
+name: core
+
+# CI for @orbitspatial/osls-core (the pure-TS engine, sdk/ts): tests, typecheck, and the
+# PRESETS-generated-file drift check. Runs when the engine or the data it embeds
+# (schema, profiles, layouts) changes.
+
+on:
+  push:
+    branches: ["**"]
+    paths:
+      - "sdk/ts/**"
+      - "schema/**"
+      - "profiles/**"
+      - "layouts/**"
+      - ".github/workflows/core.yml"
+  pull_request:
+    paths:
+      - "sdk/ts/**"
+      - "schema/**"
+      - "profiles/**"
+      - "layouts/**"
+      - ".github/workflows/core.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sdk/ts
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm ci
+      - name: PRESETS generated file is in sync
+        run: |
+          npm run embed:presets
+          git diff --exit-code src/presets.generated.ts
+      - run: npm run test
+      - run: npm run typecheck

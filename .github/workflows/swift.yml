@@ -1,0 +1,37 @@
+name: swift
+
+# Builds and tests the OSLS Swift binding (which compiles osls-core's C++ via its
+# C ABI). Runs in the official Swift container so the toolchain is present.
+
+on:
+  push:
+    branches: ["**"]
+    paths:
+      - "Package.swift"
+      - "sdk/**"
+      - "layouts/**"
+      - "profiles/**"
+      - "sdk/core/scripts/**"
+      - ".github/workflows/swift.yml"
+  pull_request:
+    paths:
+      - "Package.swift"
+      - "sdk/**"
+      - "layouts/**"
+      - "profiles/**"
+      - "sdk/core/scripts/**"
+      - ".github/workflows/swift.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: swift:5.10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ensure a C++ toolchain
+        run: apt-get update && apt-get install -y --no-install-recommends build-essential
+      - name: Build
+        run: swift build -v
+      - name: Test
+        run: swift test

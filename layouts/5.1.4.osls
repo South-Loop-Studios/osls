@@ -1,0 +1,18 @@
+osls: 1
+id: "5.1.4"
+name: "5.1.4"
+description: "5.1 + 4 overhead (top-front Ltf/Rtf at U±45, top-back Ltb/Rtb at U±135). Single surround pair at ±110. Same rig, ADM and IAMF orderings."
+vendor: io.orbitspatial
+tags: [home, immersive]
+frame: egocentric
+speakers:
+  - { id: L,   label: L,   sp: M+030, x: -0.5,   y:  0.866, z: 0.0 }
+  - { id: R,   label: R,   sp: M-030, x:  0.5,   y:  0.866, z: 0.0 }
+  - { id: C,   label: C,   sp: M+000, x:  0.0,   y:  1.0,   z: 0.0 }
+  - { id: LFE, label: LFE, sp: LFE1,  x:  0.0,   y:  1.0,   z: -0.5, lfe: true }
+  - { id: Ls,  label: Ls,  sp: M+110, x: -0.94,  y: -0.342, z: 0.0 }
+  - { id: Rs,  label: Rs,  sp: M-110, x:  0.94,  y: -0.342, z: 0.0 }
+  - { id: Ltf, label: Ltf, sp: U+045, x: -0.5,   y:  0.5,   z: 0.707 }
+  - { id: Rtf, label: Rtf, sp: U-045, x:  0.5,   y:  0.5,   z: 0.707 }
+  - { id: Ltb, label: Ltb, sp: U+135, x: -0.5,   y: -0.5,   z: 0.707, aliases: [Ltr] }
+  - { id: Rtb, label: Rtb, sp: U-135, x:  0.5,   y: -0.5,   z: 0.707, aliases: [Rtr] }

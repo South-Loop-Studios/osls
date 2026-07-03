@@ -1,0 +1,32 @@
+{
+  "name": "@orbitspatial/osls-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for the Orbit Speaker Layout System — build and edit .osls layouts from any MCP-host AI.",
+  "type": "module",
+  "bin": { "osls-mcp": "./dist/index.js" },
+  "files": ["dist", "README.md"],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "embed": "node scripts/embed-assets.mjs",
+    "build": "npm run embed && tsup && npm run build:viewer",
+    "build:viewer": "npm --prefix viewer install && npm --prefix viewer run build",
+    "typecheck": "tsc --noEmit",
+    "test": "npm run embed && vitest run",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.18.0",
+    "ws": "^8.18.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@orbitspatial/osls-core": "file:../ts",
+    "@types/node": "^22.10.0",
+    "@types/ws": "^8.5.13",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^3.0.0"
+  }
+}

@@ -1,0 +1,7 @@
+layout: "7.1.6"
+file: layouts/7.1.6.osls
+channels: 14
+lfe: [LFE1]
+orderings:
+  adm:  [M+030, M-030, M+000, LFE1, M+090, M-090, M+135, M-135, U+045, U-045, U+090, U-090, U+135, U-135]
+  iamf: [M+030, M+000, M-030, M+090, M-090, M+135, M-135, U+045, U-045, U+090, U-090, U+135, U-135, LFE1]

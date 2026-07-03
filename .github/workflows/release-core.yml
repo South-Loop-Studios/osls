@@ -1,0 +1,43 @@
+name: release-core
+
+# On a `core-v*` tag: build + pack @orbitspatial/osls-core and attach the tarball to a GitHub
+# Release. Consumers (e.g. the osls-designer repo) depend on the tarball URL:
+#   https://github.com/<owner>/osls/releases/download/core-vX.Y.Z/orbitspatial-osls-core-X.Y.Z.tgz
+# The tag is the version source (must match sdk/ts/package.json's version).
+
+on:
+  push:
+    tags: ["core-v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+      - name: Build + pack @orbitspatial/osls-core
+        working-directory: sdk/ts
+        run: |
+          npm ci
+          npm run build
+          npm pack
+      - name: Publish to npm
+        working-directory: sdk/ts
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish
+      - name: Create the Release with the tarball
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" sdk/ts/orbitspatial-osls-core-*.tgz \
+            --title "@orbitspatial/osls-core ${GITHUB_REF_NAME}" \
+            --notes "Reference \`@orbitspatial/osls-core\` build. Install via the attached tarball URL:
+          \`\"@orbitspatial/osls-core\": \"https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/$(cd sdk/ts && ls orbitspatial-osls-core-*.tgz)\"\`"

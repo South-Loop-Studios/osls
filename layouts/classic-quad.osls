@@ -1,0 +1,12 @@
+osls: 1
+id: "classic-quad"
+name: "Quad (classic corner square)"
+description: "Classic 1970s quadraphonic: four speakers at the corners of a square — front Lf/Rf at ±45 and back Lb/Rb at ±135, no centre, no LFE. The authentic quad placement; see 'quad' for the BS.2051-clean ±30/±110 4.0 variant."
+vendor: io.orbitspatial
+tags: [quad, legacy, surround]
+frame: egocentric
+speakers:
+  - { id: Lf, label: Lf, sp: M+045, x: -0.707, y:  0.707, z: 0.0 }
+  - { id: Rf, label: Rf, sp: M-045, x:  0.707, y:  0.707, z: 0.0 }
+  - { id: Lb, label: Lb, sp: M+135, x: -0.707, y: -0.707, z: 0.0 }
+  - { id: Rb, label: Rb, sp: M-135, x:  0.707, y: -0.707, z: 0.0 }

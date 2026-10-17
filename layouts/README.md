@@ -27,6 +27,7 @@ live anywhere your app looks; these are just the curated standards.
 | [`7.1.6`](./7.1.6.osls) | 7.1.6 | 7 | 1 | 6 | **14** | adm, iamf |
 | [`9.1.4`](./9.1.4.osls) | 9.1.4 | 9 | 1 | 4 | **14** | adm |
 | [`9.1.6-wide`](./9.1.6-wide.osls) | 9.1.6 (wide) | 9 | 1 | 6 | **16** | adm |
+| [`22.2`](./22.2.osls) | 22.2 (BS.2051 System H) | 10 | 2 | 12 | **24** | native |
 
 *Ear-level / Overhead* count non-LFE speakers at and above the listening plane
 (`z > 0`). *Total* is the channel count. *Orderings* lists the delivery specs

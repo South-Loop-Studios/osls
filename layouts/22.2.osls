@@ -1,0 +1,32 @@
+osls: 1
+id: "22.2"
+name: "22.2"
+description: "22.2 multichannel layout (9 upper + 10 middle + 3 lower + 2 LFE, 24 ch). ITU-R BS.2051 System H; channel order per ITU-R BS.2217-2. Carries both Cartesian and polar positions (validator-checked equal)."
+vendor: io.orbitspatial
+tags: [immersive, large-format]
+frame: egocentric   # listener-relative (BS.2051 angles, on the unit sphere). Speakers carry both Cartesian x/y/z and polar az/el.
+speakers:   # x/y/z = the same points as az/el (az positive = left).
+  - { id: M+060, label: M+060, sp: M+060, x: -0.866, y:    0.5, z:    0.0, az:   60, el:   0 }
+  - { id: M-060, label: M-060, sp: M-060, x:  0.866, y:    0.5, z:    0.0, az:  -60, el:   0 }
+  - { id: M+000, label: M+000, sp: M+000, x:    0.0, y:    1.0, z:    0.0, az:    0, el:   0 }
+  - { id: LFE1, label: LFE1, sp: LFE1, x: -0.612, y:  0.612, z:   -0.5, lfe: true }
+  - { id: M+135, label: M+135, sp: M+135, x: -0.707, y: -0.707, z:    0.0, az:  135, el:   0 }
+  - { id: M-135, label: M-135, sp: M-135, x:  0.707, y: -0.707, z:    0.0, az: -135, el:   0 }
+  - { id: M+030, label: M+030, sp: M+030, x:   -0.5, y:  0.866, z:    0.0, az:   30, el:   0 }
+  - { id: M-030, label: M-030, sp: M-030, x:    0.5, y:  0.866, z:    0.0, az:  -30, el:   0 }
+  - { id: M+180, label: M+180, sp: M+180, x:    0.0, y:   -1.0, z:    0.0, az:  180, el:   0 }
+  - { id: LFE2, label: LFE2, sp: LFE2, x:  0.612, y:  0.612, z:   -0.5, lfe: true }
+  - { id: M+090, label: M+090, sp: M+090, x:   -1.0, y:    0.0, z:    0.0, az:   90, el:   0 }
+  - { id: M-090, label: M-090, sp: M-090, x:    1.0, y:    0.0, z:    0.0, az:  -90, el:   0 }
+  - { id: U+045, label: U+045, sp: U+045, x: -0.612, y:  0.612, z:    0.5, az:   45, el:  30 }
+  - { id: U-045, label: U-045, sp: U-045, x:  0.612, y:  0.612, z:    0.5, az:  -45, el:  30 }
+  - { id: U+000, label: U+000, sp: U+000, x:    0.0, y:  0.866, z:    0.5, az:    0, el:  30 }
+  - { id: T+000, label: T+000, sp: T+000, x:    0.0, y:    0.0, z:    1.0, az:    0, el:  90 }
+  - { id: U+135, label: U+135, sp: U+135, x: -0.612, y: -0.612, z:    0.5, az:  135, el:  30 }
+  - { id: U-135, label: U-135, sp: U-135, x:  0.612, y: -0.612, z:    0.5, az: -135, el:  30 }
+  - { id: U+090, label: U+090, sp: U+090, x: -0.866, y:    0.0, z:    0.5, az:   90, el:  30 }
+  - { id: U-090, label: U-090, sp: U-090, x:  0.866, y:    0.0, z:    0.5, az:  -90, el:  30 }
+  - { id: U+180, label: U+180, sp: U+180, x:    0.0, y: -0.866, z:    0.5, az:  180, el:  30 }
+  - { id: B+000, label: B+000, sp: B+000, x:    0.0, y:  0.866, z:   -0.5, az:    0, el: -30 }
+  - { id: B+045, label: B+045, sp: B+045, x: -0.612, y:  0.612, z:   -0.5, az:   45, el: -30 }
+  - { id: B-045, label: B-045, sp: B-045, x:  0.612, y:  0.612, z:   -0.5, az:  -45, el: -30 }

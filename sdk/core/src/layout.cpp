@@ -275,7 +275,8 @@ std::vector<ValidationError> Layout::validate() const {
                 add(p, "speaker '" + s.id + "' appears " + std::to_string(seen.count(s.id)) + " times (expected 1)");
     }
 
-    // Rule 7 — arrays group existing speakers, all LFE (a sub array) or none; one array per speaker and per sp.
+    // Rule 7 — arrays group existing speakers, all LFE (a sub array) or none; one array per speaker and per sp;
+    // a speaker at the array's sp (its principal) is a member.
     std::set<std::string> arrayIds;
     std::map<std::string, std::string> memberOf, arraySp;
     for (const auto& a : arrays) {
@@ -295,10 +296,15 @@ std::vector<ValidationError> Layout::validate() const {
             else add(p, "speaker '" + m + "' is already in array '" + it->second + "'");
         }
         if (lfeMembers > 0 && lfeMembers < known) add(p, "mixes LFE and non-LFE speakers (a sub array is all LFE)");
-        if (!a.sp.empty()) {
+        if (a.sp.empty()) add(p, "needs an sp — the position it stands in for");
+        else {
             auto it = arraySp.find(a.sp);
             if (it != arraySp.end()) add(p, "sp '" + a.sp + "' already used by array '" + it->second + "'");
             else arraySp[a.sp] = a.id;
+            // The principal: a speaker at the array's position is one of its members.
+            for (const auto& s : speakers)
+                if (s.sp == a.sp && std::find(a.speakers.begin(), a.speakers.end(), s.id) == a.speakers.end())
+                    add(p, "speaker '" + s.id + "' is at the array's position " + a.sp + ", so it must be a member");
         }
     }
     return errs;

@@ -81,7 +81,8 @@ export function semanticCheck(layout: LayoutData): ValidationIssue[] {
     }
   }
 
-  // Rule 7 — arrays group existing speakers, all LFE (a sub array) or none; one array per speaker and per sp.
+  // Rule 7 — arrays group existing speakers, all LFE (a sub array) or none; one array per speaker and per sp;
+  // a speaker at the array's sp (its principal) is a member.
   const arrayIds = new Set<string>();
   const memberOf = new Map<string, string>();
   const arraySp = new Map<string, string>();
@@ -106,10 +107,15 @@ export function semanticCheck(layout: LayoutData): ValidationIssue[] {
       else err(p, `speaker "${m}" is already in array "${owner}"`);
     }
     if (lfeMembers > 0 && lfeMembers < known) err(p, "mixes LFE and non-LFE speakers (a sub array is all LFE)");
-    if (a.sp) {
+    if (!a.sp) err(p, "an array needs an sp — the position it stands in for");
+    else {
       const owner = arraySp.get(a.sp);
       if (owner !== undefined) err(p, `sp "${a.sp}" already used by array "${owner}"`);
       else arraySp.set(a.sp, a.id);
+      // The principal: a speaker at the array's position is one of its members.
+      for (const s of layout.speakers)
+        if (s.sp === a.sp && !a.speakers.includes(s.id))
+          err(p, `speaker "${s.id}" is at the array's position ${a.sp}, so it must be a member`);
     }
   }
 

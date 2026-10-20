@@ -56,12 +56,12 @@
   "$defs": {
     "array": {
       "type": "object",
-      "required": ["id", "name", "speakers"],
+      "required": ["id", "name", "sp", "speakers"],
       "additionalProperties": false,
       "properties": {
         "id": { "type": "string", "minLength": 1, "description": "Layout-local stable key for the array." },
         "name": { "type": "string", "minLength": 1, "description": "Display name (\"Left rear\")." },
-        "sp": { "type": "string", "description": "ITU-R BS.2051 SP-label of the position the array stands in for (e.g. M+135)." },
+        "sp": { "type": "string", "minLength": 1, "description": "ITU-R BS.2051 SP-label of the position the array stands in for (e.g. M+135)." },
         "speakers": { "type": "array", "minItems": 2, "items": { "type": "string" }, "description": "Member speaker ids." }
       }
     },

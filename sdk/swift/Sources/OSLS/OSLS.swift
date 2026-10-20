@@ -130,7 +130,7 @@ public struct Speaker: Equatable, Sendable {
 public struct SpeakerArray: Equatable, Sendable {
     public var id: String
     public var name: String
-    /// ITU-R BS.2051 SP-label of the position the array stands in for; may be empty.
+    /// ITU-R BS.2051 SP-label of the position the array stands in for (required).
     public var sp: String
     /// Member speaker ids.
     public var speakers: [String]

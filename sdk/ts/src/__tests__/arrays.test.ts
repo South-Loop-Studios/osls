@@ -35,13 +35,14 @@ describe("arrays (SPEC §2.4)", () => {
   });
 
   it.each([
-    ["unknown speaker", `  - { id: a, name: A, speakers: [Lrs1, Nope] }\n`],
-    ["LFE mixed with mains", `  - { id: a, name: A, speakers: [Lrs1, LFE] }\n`],
-    ["one member", `  - { id: a, name: A, speakers: [Lrs1] }\n`],
-    ["speaker in two arrays", `  - { id: a, name: A, speakers: [Lrs1, Lrs2] }\n  - { id: b, name: B, speakers: [Lrs2, Lrs3] }\n`],
-    ["listed twice", `  - { id: a, name: A, speakers: [Lrs1, Lrs1] }\n`],
-    ["duplicate id", `  - { id: a, name: A, speakers: [Lrs1, Lrs2] }\n  - { id: a, name: B, speakers: [Lrs3, Lrs2] }\n`],
-    ["missing name", `  - { id: a, speakers: [Lrs1, Lrs2] }\n`],
+    ["unknown speaker", `  - { id: a, name: A, sp: M+135, speakers: [Lrs1, Nope] }\n`],
+    ["LFE mixed with mains", `  - { id: a, name: A, sp: M+135, speakers: [Lrs1, LFE] }\n`],
+    ["one member", `  - { id: a, name: A, sp: M+135, speakers: [Lrs1] }\n`],
+    ["speaker in two arrays", `  - { id: a, name: A, sp: M+135, speakers: [Lrs1, Lrs2] }\n  - { id: b, name: B, sp: M-135, speakers: [Lrs2, Lrs3] }\n`],
+    ["listed twice", `  - { id: a, name: A, sp: M+135, speakers: [Lrs1, Lrs1] }\n`],
+    ["duplicate id", `  - { id: a, name: A, sp: M+135, speakers: [Lrs1, Lrs2] }\n  - { id: a, name: B, sp: M+135, speakers: [Lrs3, Lrs2] }\n`],
+    ["missing name", `  - { id: a, sp: M+135, speakers: [Lrs1, Lrs2] }\n`],
+    ["no sp", `  - { id: a, name: A, speakers: [Lrs1, Lrs2] }\n`],
   ])("rejects %s", (_what, block) => {
     expect(() => parseLayout(withArrays(block))).toThrow(OSLSError);
   });
@@ -74,5 +75,12 @@ arrays:
   - { id: b, name: B, sp: M+090, speakers: [C, D] }
 `;
     expect(() => parseLayout(text)).toThrow(OSLSError);
+  });
+
+  it("needs the principal — a speaker at the array's position — as a member", () => {
+    const rig = `${RIG}  - { id: Lrs, label: Lrs, sp: M+135, x: -0.7, y: -0.7, z: 0 }\n`;
+    expect(() => parseLayout(`${rig}arrays:\n  - { id: a, name: A, sp: M+135, speakers: [Lrs1, Lrs2] }\n`)).toThrow(OSLSError);
+    const l = parseLayout(`${rig}arrays:\n  - { id: a, name: A, sp: M+135, speakers: [Lrs, Lrs1, Lrs2] }\n`);
+    expect(l.arrayFor("Lrs")?.id).toBe("a");
   });
 });

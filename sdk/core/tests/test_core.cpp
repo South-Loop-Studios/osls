@@ -272,8 +272,8 @@ void test_arrays() {
     osls_free(b);
 
     std::string rig(kArrayRig);
-    expect_reject("array: unknown speaker", (rig + "arrays:\n  - { id: a, name: A, speakers: [Lrs1, Nope] }\n").c_str());
-    expect_reject("array: LFE mixed with mains", (rig + "arrays:\n  - { id: a, name: A, speakers: [Lrs1, LFE] }\n").c_str());
+    expect_reject("array: unknown speaker", (rig + "arrays:\n  - { id: a, name: A, sp: M+135, speakers: [Lrs1, Nope] }\n").c_str());
+    expect_reject("array: LFE mixed with mains", (rig + "arrays:\n  - { id: a, name: A, sp: M+135, speakers: [Lrs1, LFE] }\n").c_str());
     // A sub array: every member an LFE.
     Layout subs = Layout::loadString(
         "osls: 1\nid: s\nname: S\nspeakers:\n"
@@ -282,21 +282,29 @@ void test_arrays() {
         "  - { id: Sub2, label: Sub2, x: 0.5, y: 1, z: -0.5, lfe: true }\n"
         "arrays:\n  - { id: subs, name: Subs, sp: LFE1, speakers: [Sub1, Sub2] }\n");
     CHECK(subs.arrays.size() == 1 && subs.arrayForSpeaker("Sub2") == &subs.arrays[0]);
-    expect_reject("array: one member", (rig + "arrays:\n  - { id: a, name: A, speakers: [Lrs1] }\n").c_str());
+    expect_reject("array: one member", (rig + "arrays:\n  - { id: a, name: A, sp: M+135, speakers: [Lrs1] }\n").c_str());
     expect_reject("array: speaker in two arrays",
-                  (rig + "arrays:\n  - { id: a, name: A, speakers: [Lrs1, Lrs2] }\n"
-                         "  - { id: b, name: B, speakers: [Lrs2, Lrs3] }\n").c_str());
-    expect_reject("array: listed twice", (rig + "arrays:\n  - { id: a, name: A, speakers: [Lrs1, Lrs1] }\n").c_str());
+                  (rig + "arrays:\n  - { id: a, name: A, sp: M+135, speakers: [Lrs1, Lrs2] }\n"
+                         "  - { id: b, name: B, sp: M-135, speakers: [Lrs2, Lrs3] }\n").c_str());
+    expect_reject("array: listed twice", (rig + "arrays:\n  - { id: a, name: A, sp: M+135, speakers: [Lrs1, Lrs1] }\n").c_str());
     expect_reject("array: duplicate id",
-                  (rig + "arrays:\n  - { id: a, name: A, speakers: [Lrs1, Lrs2] }\n"
-                         "  - { id: a, name: B, speakers: [Lrs3, Lrs2] }\n").c_str());
+                  (rig + "arrays:\n  - { id: a, name: A, sp: M+135, speakers: [Lrs1, Lrs2] }\n"
+                         "  - { id: a, name: B, sp: M+135, speakers: [Lrs3, Lrs2] }\n").c_str());
     expect_reject("array: shared sp",
                   "osls: 1\nid: x\nname: x\nspeakers:\n"
                   "  - { id: A, label: A, x: -1, y: 0, z: 0 }\n  - { id: B, label: B, x: -1, y: 0.2, z: 0 }\n"
                   "  - { id: C, label: C, x: -1, y: -0.5, z: 0 }\n  - { id: D, label: D, x: -1, y: -0.7, z: 0 }\n"
                   "arrays:\n  - { id: a, name: A, sp: M+090, speakers: [A, B] }\n"
                   "  - { id: b, name: B, sp: M+090, speakers: [C, D] }\n");
-    expect_reject("array: missing name", (rig + "arrays:\n  - { id: a, speakers: [Lrs1, Lrs2] }\n").c_str());
+    expect_reject("array: missing name", (rig + "arrays:\n  - { id: a, sp: M+135, speakers: [Lrs1, Lrs2] }\n").c_str());
+    expect_reject("array: no sp", (rig + "arrays:\n  - { id: a, name: A, speakers: [Lrs1, Lrs2] }\n").c_str());
+    // A speaker at the array's position (its principal) must be a member.
+    std::string withPrincipal = rig + "  - { id: Lrs, label: Lrs, sp: M+135, x: -0.7, y: -0.7, z: 0 }\n";
+    expect_reject("array: principal left out",
+                  (withPrincipal + "arrays:\n  - { id: a, name: A, sp: M+135, speakers: [Lrs1, Lrs2] }\n").c_str());
+    Layout principal = Layout::loadString(
+        withPrincipal + "arrays:\n  - { id: a, name: A, sp: M+135, speakers: [Lrs, Lrs1, Lrs2] }\n");
+    CHECK(principal.arrayForSpeaker("Lrs") == &principal.arrays[0]);
 }
 
 }  // namespace

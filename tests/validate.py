@@ -142,7 +142,8 @@ def validate_layout(path: str, schema_validator: Draft202012Validator, errs: Err
                 f"not a permutation of the speaker set ({len(oids)} entries vs {len(ids)} speakers)",
             )
 
-    # Rule 7 — arrays group existing speakers, all LFE (a sub array) or none; one array per speaker and per sp.
+    # Rule 7 — arrays group existing speakers, all LFE (a sub array) or none; one array per speaker and per sp;
+    # a speaker at the array's sp (its principal) is a member.
     lfe = {s["id"] for s in speakers if s.get("lfe")}
     member_of: dict[str, str] = {}
     array_sp: dict[str, str] = {}
@@ -161,11 +162,17 @@ def validate_layout(path: str, schema_validator: Draft202012Validator, errs: Err
                 errs.add(where, f"speaker {m} is already in array {member_of[m]}")
             else:
                 member_of[m] = a["id"]
-        if a.get("sp"):
+        if not a.get("sp"):
+            errs.add(where, "needs an sp — the position it stands in for")
+        else:
             if a["sp"] in array_sp:
                 errs.add(where, f"sp {a['sp']} already used by array {array_sp[a['sp']]}")
             else:
                 array_sp[a["sp"]] = a["id"]
+            # The principal: a speaker at the array's position is one of its members.
+            for s in speakers:
+                if s.get("sp") == a["sp"] and s["id"] not in a["speakers"]:
+                    errs.add(where, f"speaker {s['id']} is at the array's position {a['sp']}, so it must be a member")
 
     return doc
 

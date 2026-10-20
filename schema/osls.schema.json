@@ -46,9 +46,25 @@
           ]
         }
       }
+    },
+    "arrays": {
+      "type": "array",
+      "description": "Optional speaker groupings (SPEC §2.4): speakers that together stand in for one position, e.g. a cinema side-surround array.",
+      "items": { "$ref": "#/$defs/array" }
     }
   },
   "$defs": {
+    "array": {
+      "type": "object",
+      "required": ["id", "name", "speakers"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "description": "Layout-local stable key for the array." },
+        "name": { "type": "string", "minLength": 1, "description": "Display name (\"Left rear\")." },
+        "sp": { "type": "string", "description": "ITU-R BS.2051 SP-label of the position the array stands in for (e.g. M+135)." },
+        "speakers": { "type": "array", "minItems": 2, "items": { "type": "string" }, "description": "Member speaker ids." }
+      }
+    },
     "speaker": {
       "type": "object",
       "required": ["id", "label"],

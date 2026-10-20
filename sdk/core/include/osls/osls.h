@@ -58,6 +58,17 @@ const char* osls_speaker_alias(const osls_layout* layout, int speaker_index, int
 int osls_spec_count(const osls_layout* layout); /* declared orderings, excluding "native" */
 const char* osls_spec_name(const osls_layout* layout, int index);
 
+/* ---- Arrays (SPEC §2.4) -------------------------------------------------- */
+int osls_array_count(const osls_layout* layout);
+const char* osls_array_id(const osls_layout* layout, int array_index);
+const char* osls_array_name(const osls_layout* layout, int array_index);
+const char* osls_array_sp(const osls_layout* layout, int array_index); /* "" if none */
+int osls_array_speaker_count(const osls_layout* layout, int array_index);
+/* Native speaker index of member `member_index`, or -1. */
+int osls_array_speaker(const osls_layout* layout, int array_index, int member_index);
+/* The array index speaker `speaker_index` belongs to, or -1. */
+int osls_speaker_array(const osls_layout* layout, int speaker_index);
+
 /* ---- Authoring (build + serialise) --------------------------------------- */
 /* Which position frame(s) osls_to_yaml/osls_save write per speaker. */
 typedef enum {
@@ -83,6 +94,10 @@ void osls_set_ordering(osls_layout* layout, const char* spec, const char* const*
 /* Append one speaker id to a spec's ordering (creating it if absent) — the
  * per-id form, easier to drive from a binding than the array form above. */
 void osls_ordering_add(osls_layout* layout, const char* spec, const char* id);
+/* Add an array (sp NULL or "" for none) and return its index; then add members
+ * by speaker id. Validation runs at osls_to_yaml/osls_save, as for orderings. */
+int osls_add_array(osls_layout* layout, const char* id, const char* name, const char* sp);
+void osls_array_add_speaker(osls_layout* layout, int array_index, const char* speaker_id);
 
 /* Serialise to .osls YAML. Validates first; on failure returns NULL and writes
  * errbuf. The returned string is heap-allocated — free it with osls_string_free. */

@@ -1,6 +1,6 @@
 {
   "name": "@orbitspatial/osls-core",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Pure-TypeScript engine for the Orbit Speaker Layout System (.osls): parse, validate, serialize, geometry, and ITU-R BS.2051 SP-labels.",
   "type": "module",
   "main": "./dist/index.js",

@@ -30,4 +30,5 @@ export interface RawOsls {
   speakers: RawSpeaker[];
   aliases?: Record<string, string[]>;
   orderings?: Record<string, RawOrderingEntry[]>;
+  arrays?: { id: string; name: string; sp?: string; speakers: string[] }[];
 }

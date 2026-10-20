@@ -14,6 +14,7 @@ export type {
   ProfileLayout,
   Ordering,
   Frame,
+  SpeakerArray,
 } from "./types";
 export { OSLSError } from "./types";
 export {

@@ -44,6 +44,17 @@ export interface Speaker {
   authoredPolar?: Polar;
 }
 
+/** Speakers that together stand in for one position — e.g. a cinema side-surround
+ *  array (SPEC §2.4). Grouping only; what plays through it is the renderer's business. */
+export interface SpeakerArray {
+  id: string;
+  name: string;
+  /** ITU-R BS.2051 SP-label of the position the array stands in for; may be empty. */
+  sp: string;
+  /** Member speaker ids. */
+  speakers: string[];
+}
+
 /** A plain, serialisable layout — the shape held by the zustand store and zundo history. */
 export interface LayoutData {
   osls: number;
@@ -60,6 +71,8 @@ export interface LayoutData {
   orderings: Record<string, string[]>;
   /** Optional spec-specific label overrides: spec -> (speaker id -> label). Rare. */
   orderingLabels?: Record<string, Record<string, string>>;
+  /** Optional speaker groupings (SPEC §2.4). */
+  arrays?: SpeakerArray[];
 }
 
 export interface ValidationIssue {

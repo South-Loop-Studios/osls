@@ -206,6 +206,20 @@ Layout Layout::parseUnchecked(const std::string& text) {
             L.orderings[kv.first] = std::move(entries);
         }
     }
+
+    if (const Node* ar = root.find("arrays")) {
+        if (!ar->isSeq()) bad("arrays: must be a list");
+        for (const auto& an : ar->seq) {
+            if (!an.isMap()) bad("arrays: each item must be a mapping");
+            Array a;
+            a.id = asString(require(an, "id", "array"), "array.id");
+            std::string ctx = "array '" + a.id + "'";
+            a.name = asString(require(an, "name", ctx), ctx + ".name");
+            if (const Node* n = an.find("sp")) a.sp = asString(*n, ctx + ".sp");
+            a.speakers = asStringList(require(an, "speakers", ctx), ctx + ".speakers");
+            L.arrays.push_back(std::move(a));
+        }
+    }
     return L;
 }
 
@@ -259,6 +273,31 @@ std::vector<ValidationError> Layout::validate() const {
         for (const auto& s : speakers)
             if (seen.count(s.id) != 1)
                 add(p, "speaker '" + s.id + "' appears " + std::to_string(seen.count(s.id)) + " times (expected 1)");
+    }
+
+    // Rule 7 — arrays group existing, non-LFE speakers; one array per speaker and per sp.
+    std::set<std::string> arrayIds;
+    std::map<std::string, std::string> memberOf, arraySp;
+    for (const auto& a : arrays) {
+        std::string p = "arrays[" + a.id + "]";
+        if (a.id.empty()) add("arrays", "an array has an empty id");
+        if (!arrayIds.insert(a.id).second) add(p, "duplicate array id");
+        if (a.name.empty()) add(p, "empty name");
+        if (a.speakers.size() < 2) add(p, "needs at least 2 speakers");
+        for (const auto& m : a.speakers) {
+            const Speaker* s = speakerById(m);
+            if (!s) add(p, "references unknown speaker id '" + m + "'");
+            else if (s->lfe) add(p, "speaker '" + m + "' is an LFE and cannot join an array");
+            auto it = memberOf.find(m);
+            if (it == memberOf.end()) memberOf[m] = a.id;
+            else if (it->second == a.id) add(p, "lists speaker '" + m + "' twice");
+            else add(p, "speaker '" + m + "' is already in array '" + it->second + "'");
+        }
+        if (!a.sp.empty()) {
+            auto it = arraySp.find(a.sp);
+            if (it != arraySp.end()) add(p, "sp '" + a.sp + "' already used by array '" + it->second + "'");
+            else arraySp[a.sp] = a.id;
+        }
     }
     return errs;
 }
@@ -369,6 +408,19 @@ std::vector<std::size_t> Layout::lfeIndices() const {
     for (std::size_t i = 0; i < speakers.size(); ++i)
         if (speakers[i].lfe) out.push_back(i);
     return out;
+}
+
+const Array* Layout::arrayById(const std::string& q) const {
+    for (const auto& a : arrays)
+        if (a.id == q) return &a;
+    return nullptr;
+}
+
+const Array* Layout::arrayForSpeaker(const std::string& speakerId) const {
+    for (const auto& a : arrays)
+        for (const auto& m : a.speakers)
+            if (m == speakerId) return &a;
+    return nullptr;
 }
 
 std::vector<Speaker> Layout::order(const std::string& spec) const {
@@ -484,6 +536,17 @@ std::string Layout::toYAML(WriteFrame frame) const {
                 else os << scalar(e.speaker);
             }
             os << "]\n";
+        }
+    }
+
+    if (!arrays.empty()) {
+        os << "arrays:\n";
+        for (const auto& a : arrays) {
+            os << "  - { id: " << scalar(a.id) << ", name: " << scalar(a.name);
+            if (!a.sp.empty()) os << ", sp: " << scalar(a.sp);
+            os << ", speakers: [";
+            for (std::size_t i = 0; i < a.speakers.size(); ++i) os << (i ? ", " : "") << scalar(a.speakers[i]);
+            os << "] }\n";
         }
     }
     return os.str();

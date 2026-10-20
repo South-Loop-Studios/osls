@@ -81,6 +81,32 @@ export function semanticCheck(layout: LayoutData): ValidationIssue[] {
     }
   }
 
+  // Rule 7 — arrays group existing, non-LFE speakers; one array per speaker and per sp.
+  const arrayIds = new Set<string>();
+  const memberOf = new Map<string, string>();
+  const arraySp = new Map<string, string>();
+  for (const a of layout.arrays ?? []) {
+    const p = `arrays.${a.id}`;
+    if (arrayIds.has(a.id)) err(p, `duplicate array id "${a.id}"`);
+    arrayIds.add(a.id);
+    if (!a.name) err(p, "array has an empty name");
+    if (a.speakers.length < 2) err(p, "an array needs at least 2 speakers");
+    for (const m of a.speakers) {
+      const s = layout.speakers.find((x) => x.id === m);
+      if (!s) err(p, `references unknown speaker "${m}"`);
+      else if (s.isLFE) err(p, `speaker "${m}" is an LFE and cannot join an array`);
+      const owner = memberOf.get(m);
+      if (owner === undefined) memberOf.set(m, a.id);
+      else if (owner === a.id) err(p, `lists speaker "${m}" twice`);
+      else err(p, `speaker "${m}" is already in array "${owner}"`);
+    }
+    if (a.sp) {
+      const owner = arraySp.get(a.sp);
+      if (owner !== undefined) err(p, `sp "${a.sp}" already used by array "${owner}"`);
+      else arraySp.set(a.sp, a.id);
+    }
+  }
+
   // Soft warning — an LFE carrying height is unusual (not an error).
   for (const s of layout.speakers) {
     if (s.isLFE && Math.abs(s.cartesian.z) > 0.2) {

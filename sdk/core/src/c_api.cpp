@@ -189,6 +189,56 @@ void osls_ordering_add(osls_layout* h, const char* spec, const char* id) {
     if (L && spec && id) L->orderings[spec].emplace_back(std::string(id));
 }
 
+int osls_array_count(const osls_layout* h) { return h ? static_cast<int>(as_cpp(h)->arrays.size()) : 0; }
+
+static const osls::Array* array_at(const osls_layout* h, int i) {
+    const osls::Layout* L = as_cpp(h);
+    return (L && i >= 0 && i < static_cast<int>(L->arrays.size())) ? &L->arrays[i] : nullptr;
+}
+
+const char* osls_array_id(const osls_layout* h, int i) {
+    const osls::Array* a = array_at(h, i);
+    return a ? a->id.c_str() : nullptr;
+}
+const char* osls_array_name(const osls_layout* h, int i) {
+    const osls::Array* a = array_at(h, i);
+    return a ? a->name.c_str() : nullptr;
+}
+const char* osls_array_sp(const osls_layout* h, int i) {
+    const osls::Array* a = array_at(h, i);
+    return a ? a->sp.c_str() : nullptr;
+}
+int osls_array_speaker_count(const osls_layout* h, int i) {
+    const osls::Array* a = array_at(h, i);
+    return a ? static_cast<int>(a->speakers.size()) : 0;
+}
+int osls_array_speaker(const osls_layout* h, int i, int j) {
+    const osls::Array* a = array_at(h, i);
+    if (!a || j < 0 || j >= static_cast<int>(a->speakers.size())) return -1;
+    const auto& sp = as_cpp(h)->speakers;
+    for (std::size_t k = 0; k < sp.size(); ++k)
+        if (sp[k].id == a->speakers[j]) return static_cast<int>(k);
+    return -1;
+}
+int osls_speaker_array(const osls_layout* h, int i) {
+    const osls::Layout* L = as_cpp(h);
+    if (!in_range(L, i)) return -1;
+    const osls::Array* a = L->arrayForSpeaker(L->speakers[i].id);
+    return a ? static_cast<int>(a - L->arrays.data()) : -1;
+}
+
+int osls_add_array(osls_layout* h, const char* id, const char* name, const char* sp) {
+    osls::Layout* L = as_mut(h);
+    if (!L || !id) return -1;
+    L->arrays.push_back({id, name ? name : id, sp ? sp : "", {}});
+    return static_cast<int>(L->arrays.size()) - 1;
+}
+void osls_array_add_speaker(osls_layout* h, int i, const char* speaker_id) {
+    osls::Layout* L = as_mut(h);
+    if (L && speaker_id && i >= 0 && i < static_cast<int>(L->arrays.size()))
+        L->arrays[i].speakers.emplace_back(speaker_id);
+}
+
 char* osls_to_yaml(const osls_layout* h, osls_write_frame frame, char* errbuf, size_t errlen) {
     if (!h) {
         copy_err(errbuf, errlen, "null layout");

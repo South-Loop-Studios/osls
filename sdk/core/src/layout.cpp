@@ -275,7 +275,7 @@ std::vector<ValidationError> Layout::validate() const {
                 add(p, "speaker '" + s.id + "' appears " + std::to_string(seen.count(s.id)) + " times (expected 1)");
     }
 
-    // Rule 7 — arrays group existing, non-LFE speakers; one array per speaker and per sp.
+    // Rule 7 — arrays group existing speakers, all LFE (a sub array) or none; one array per speaker and per sp.
     std::set<std::string> arrayIds;
     std::map<std::string, std::string> memberOf, arraySp;
     for (const auto& a : arrays) {
@@ -284,15 +284,17 @@ std::vector<ValidationError> Layout::validate() const {
         if (!arrayIds.insert(a.id).second) add(p, "duplicate array id");
         if (a.name.empty()) add(p, "empty name");
         if (a.speakers.size() < 2) add(p, "needs at least 2 speakers");
+        int lfeMembers = 0, known = 0;
         for (const auto& m : a.speakers) {
             const Speaker* s = speakerById(m);
             if (!s) add(p, "references unknown speaker id '" + m + "'");
-            else if (s->lfe) add(p, "speaker '" + m + "' is an LFE and cannot join an array");
+            else { ++known; lfeMembers += s->lfe ? 1 : 0; }
             auto it = memberOf.find(m);
             if (it == memberOf.end()) memberOf[m] = a.id;
             else if (it->second == a.id) add(p, "lists speaker '" + m + "' twice");
             else add(p, "speaker '" + m + "' is already in array '" + it->second + "'");
         }
+        if (lfeMembers > 0 && lfeMembers < known) add(p, "mixes LFE and non-LFE speakers (a sub array is all LFE)");
         if (!a.sp.empty()) {
             auto it = arraySp.find(a.sp);
             if (it != arraySp.end()) add(p, "sp '" + a.sp + "' already used by array '" + it->second + "'");

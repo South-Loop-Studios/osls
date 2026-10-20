@@ -100,7 +100,7 @@ arrays:
   - { id: left-rear,  name: "Left rear",  sp: M+135, speakers: [Lrs1, Lrs2, Lrs3] }
 ```
 
-A speaker belongs to **one array at most**, an LFE never joins one, and no two arrays stand in for the same `sp` (§4 rule 7). Arrays add nothing to `orderings`: every member is still an ordinary speaker with its own channel. The blessed layouts carry no arrays — each of their positions is a single speaker.
+A speaker belongs to **one array at most**, and no two arrays stand in for the same `sp` (§4 rule 7). An array is all LFE speakers — a **sub array**, standing in for `LFE1` — or has none: subs and main speakers never share one. Arrays add nothing to `orderings`: every member is still an ordinary speaker with its own channel. The blessed layouts carry no arrays — each of their positions is a single speaker.
 
 ## Profiles (per-format channel orders)
 
@@ -133,7 +133,7 @@ The SDK MUST validate before accepting a layout. Rules:
 5. **Identity sanity** — distinct physical positions must not collapse to the same `sp` (e.g. side `M+090` ≠ wide `M+060`); aliases must be true aliases, never cross-position.
 6. **Profiles** are checked against the standard orders, and every blessed layout must project completely (`missing === []`) for each format that defines it (the conformance test in CI). A profile entry whose `order` array omits a speaker that the rig carries — or adds a position the rig lacks — fails the build, so the profiles are the always-correct, conformance-gated source of format order.
 
-7. **Arrays** (§2.4) — unique array `id`s and a non-empty `name`; at least two members; every member references an existing speaker `id`, is not an LFE, and appears in one array only (and once within it); no two arrays share an `sp`.
+7. **Arrays** (§2.4) — unique array `id`s and a non-empty `name`; at least two members; every member references an existing speaker `id` and appears in one array only (and once within it); the members are all LFE or none; no two arrays share an `sp`.
 
 Validation failures return structured errors (path + reason), never silent acceptance.
 

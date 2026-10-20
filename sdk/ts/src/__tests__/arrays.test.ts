@@ -36,7 +36,7 @@ describe("arrays (SPEC §2.4)", () => {
 
   it.each([
     ["unknown speaker", `  - { id: a, name: A, speakers: [Lrs1, Nope] }\n`],
-    ["LFE member", `  - { id: a, name: A, speakers: [Lrs1, LFE] }\n`],
+    ["LFE mixed with mains", `  - { id: a, name: A, speakers: [Lrs1, LFE] }\n`],
     ["one member", `  - { id: a, name: A, speakers: [Lrs1] }\n`],
     ["speaker in two arrays", `  - { id: a, name: A, speakers: [Lrs1, Lrs2] }\n  - { id: b, name: B, speakers: [Lrs2, Lrs3] }\n`],
     ["listed twice", `  - { id: a, name: A, speakers: [Lrs1, Lrs1] }\n`],
@@ -44,6 +44,20 @@ describe("arrays (SPEC §2.4)", () => {
     ["missing name", `  - { id: a, speakers: [Lrs1, Lrs2] }\n`],
   ])("rejects %s", (_what, block) => {
     expect(() => parseLayout(withArrays(block))).toThrow(OSLSError);
+  });
+
+  it("accepts a sub array (every member an LFE)", () => {
+    const l = parseLayout(`osls: 1
+id: s
+name: S
+speakers:
+  - { id: L, label: L, x: -0.5, y: 0.866, z: 0 }
+  - { id: Sub1, label: Sub1, x: -0.5, y: 1, z: -0.5, lfe: true }
+  - { id: Sub2, label: Sub2, x: 0.5, y: 1, z: -0.5, lfe: true }
+arrays:
+  - { id: subs, name: Subs, sp: LFE1, speakers: [Sub1, Sub2] }
+`);
+    expect(l.arrayFor("Sub2")?.id).toBe("subs");
   });
 
   it("rejects two arrays standing in for the same sp", () => {

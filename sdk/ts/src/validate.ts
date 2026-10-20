@@ -81,7 +81,7 @@ export function semanticCheck(layout: LayoutData): ValidationIssue[] {
     }
   }
 
-  // Rule 7 — arrays group existing, non-LFE speakers; one array per speaker and per sp.
+  // Rule 7 — arrays group existing speakers, all LFE (a sub array) or none; one array per speaker and per sp.
   const arrayIds = new Set<string>();
   const memberOf = new Map<string, string>();
   const arraySp = new Map<string, string>();
@@ -91,15 +91,21 @@ export function semanticCheck(layout: LayoutData): ValidationIssue[] {
     arrayIds.add(a.id);
     if (!a.name) err(p, "array has an empty name");
     if (a.speakers.length < 2) err(p, "an array needs at least 2 speakers");
+    let lfeMembers = 0;
+    let known = 0;
     for (const m of a.speakers) {
       const s = layout.speakers.find((x) => x.id === m);
       if (!s) err(p, `references unknown speaker "${m}"`);
-      else if (s.isLFE) err(p, `speaker "${m}" is an LFE and cannot join an array`);
+      else {
+        known++;
+        if (s.isLFE) lfeMembers++;
+      }
       const owner = memberOf.get(m);
       if (owner === undefined) memberOf.set(m, a.id);
       else if (owner === a.id) err(p, `lists speaker "${m}" twice`);
       else err(p, `speaker "${m}" is already in array "${owner}"`);
     }
+    if (lfeMembers > 0 && lfeMembers < known) err(p, "mixes LFE and non-LFE speakers (a sub array is all LFE)");
     if (a.sp) {
       const owner = arraySp.get(a.sp);
       if (owner !== undefined) err(p, `sp "${a.sp}" already used by array "${owner}"`);

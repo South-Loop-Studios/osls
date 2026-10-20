@@ -142,7 +142,7 @@ def validate_layout(path: str, schema_validator: Draft202012Validator, errs: Err
                 f"not a permutation of the speaker set ({len(oids)} entries vs {len(ids)} speakers)",
             )
 
-    # Rule 7 — arrays group existing, non-LFE speakers; one array per speaker and per sp.
+    # Rule 7 — arrays group existing speakers, all LFE (a sub array) or none; one array per speaker and per sp.
     lfe = {s["id"] for s in speakers if s.get("lfe")}
     member_of: dict[str, str] = {}
     array_sp: dict[str, str] = {}
@@ -151,11 +151,12 @@ def validate_layout(path: str, schema_validator: Draft202012Validator, errs: Err
         errs.add(f"{name}:arrays:{aid}", "duplicate array id")
     for a in doc.get("arrays") or []:
         where = f"{name}:arrays:{a['id']}"
+        known = [m for m in a["speakers"] if m in ids]
+        if 0 < sum(m in lfe for m in known) < len(known):
+            errs.add(where, "mixes LFE and non-LFE speakers (a sub array is all LFE)")
         for m in a["speakers"]:
             if m not in ids:
                 errs.add(where, f"references unknown speaker id {m}")
-            elif m in lfe:
-                errs.add(where, f"speaker {m} is an LFE and cannot join an array")
             if m in member_of:
                 errs.add(where, f"speaker {m} is already in array {member_of[m]}")
             else:

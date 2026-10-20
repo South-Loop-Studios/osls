@@ -273,7 +273,15 @@ void test_arrays() {
 
     std::string rig(kArrayRig);
     expect_reject("array: unknown speaker", (rig + "arrays:\n  - { id: a, name: A, speakers: [Lrs1, Nope] }\n").c_str());
-    expect_reject("array: LFE member", (rig + "arrays:\n  - { id: a, name: A, speakers: [Lrs1, LFE] }\n").c_str());
+    expect_reject("array: LFE mixed with mains", (rig + "arrays:\n  - { id: a, name: A, speakers: [Lrs1, LFE] }\n").c_str());
+    // A sub array: every member an LFE.
+    Layout subs = Layout::loadString(
+        "osls: 1\nid: s\nname: S\nspeakers:\n"
+        "  - { id: L, label: L, x: -0.5, y: 0.866, z: 0 }\n"
+        "  - { id: Sub1, label: Sub1, x: -0.5, y: 1, z: -0.5, lfe: true }\n"
+        "  - { id: Sub2, label: Sub2, x: 0.5, y: 1, z: -0.5, lfe: true }\n"
+        "arrays:\n  - { id: subs, name: Subs, sp: LFE1, speakers: [Sub1, Sub2] }\n");
+    CHECK(subs.arrays.size() == 1 && subs.arrayForSpeaker("Sub2") == &subs.arrays[0]);
     expect_reject("array: one member", (rig + "arrays:\n  - { id: a, name: A, speakers: [Lrs1] }\n").c_str());
     expect_reject("array: speaker in two arrays",
                   (rig + "arrays:\n  - { id: a, name: A, speakers: [Lrs1, Lrs2] }\n"

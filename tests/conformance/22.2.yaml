@@ -1,0 +1,5 @@
+layout: "22.2"
+file: layouts/22.2.osls
+channels: 24
+lfe: [LFE1, LFE2]
+orderings: {}   # the native order (the file's speaker list) is the ITU-R BS.2217-2 order

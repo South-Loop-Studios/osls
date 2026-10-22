@@ -123,6 +123,22 @@ public struct Speaker: Equatable, Sendable {
     }
 }
 
+// MARK: - Arrays
+
+/// Speakers that together stand in for one position — e.g. a cinema side-surround
+/// array (SPEC §2.4). Grouping only; what plays through it is the renderer's business.
+public struct SpeakerArray: Equatable, Sendable {
+    public var id: String
+    public var name: String
+    /// ITU-R BS.2051 SP-label of the position the array stands in for (required).
+    public var sp: String
+    /// Member speaker ids.
+    public var speakers: [String]
+    public init(id: String, name: String, sp: String = "", speakers: [String]) {
+        self.id = id; self.name = name; self.sp = sp; self.speakers = speakers
+    }
+}
+
 // MARK: - Layout
 
 public struct Layout: Equatable, Sendable {
@@ -135,6 +151,8 @@ public struct Layout: Equatable, Sendable {
     public var speakers: [Speaker] = []
     /// spec name -> channel order as speaker ids ("native" is implied by `speakers`).
     public var orderings: [String: [String]] = [:]
+    /// Optional speaker groupings (SPEC §2.4).
+    public var arrays: [SpeakerArray] = []
 
     public init() {}
     public init(id: String, name: String) { self.id = id; self.name = name }
@@ -186,6 +204,16 @@ public struct Layout: Equatable, Sendable {
                 orderings[spec] = (0..<Int(count)).map { String(cString: osls_speaker_id(h, idx[$0])) }
             }
         }
+
+        for a in 0..<osls_array_count(h) {
+            let members = (0..<osls_array_speaker_count(h, a)).map {
+                String(cString: osls_speaker_id(h, osls_array_speaker(h, a, $0)))
+            }
+            arrays.append(SpeakerArray(id: String(cString: osls_array_id(h, a)),
+                                       name: String(cString: osls_array_name(h, a)),
+                                       sp: String(cString: osls_array_sp(h, a)),
+                                       speakers: members))
+        }
     }
 
     // MARK: Queries
@@ -208,6 +236,11 @@ public struct Layout: Equatable, Sendable {
     }
 
     public var specs: [String] { ["native"] + orderings.keys.sorted() }
+
+    /// The array a speaker (by id) belongs to — a speaker is in one at most.
+    public func array(for speakerId: String) -> SpeakerArray? {
+        arrays.first { $0.speakers.contains(speakerId) }
+    }
 
     // MARK: Authoring
 
@@ -234,6 +267,10 @@ public struct Layout: Equatable, Sendable {
         }
         for spec in orderings.keys.sorted() {
             for id in orderings[spec] ?? [] { osls_ordering_add(h, spec, id) }
+        }
+        for a in arrays {
+            let ai = osls_add_array(h, a.id, a.name, a.sp)
+            for m in a.speakers { osls_array_add_speaker(h, ai, m) }
         }
         var err = [CChar](repeating: 0, count: 1024)
         guard let cstr = osls_to_yaml(h, frame.raw, &err, err.count) else {

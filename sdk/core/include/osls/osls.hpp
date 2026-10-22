@@ -73,6 +73,16 @@ struct OrderingEntry {
     OrderingEntry(std::string s, std::string l) : speaker(std::move(s)), label(std::move(l)) {}
 };
 
+// A group of speakers that together stand in for one position (SPEC §2.4) —
+// e.g. a cinema side-surround array. Grouping only: what plays through it, and
+// at what level, is the consuming renderer's business.
+struct Array {
+    std::string id;
+    std::string name;
+    std::string sp;                     // BS.2051 position the array stands in for; may be empty
+    std::vector<std::string> speakers;  // member speaker ids
+};
+
 struct ValidationError {
     std::string path;
     std::string reason;
@@ -95,6 +105,7 @@ public:
     std::vector<Speaker> speakers;     // list order = native channel order
     std::map<std::string, std::vector<std::string>> layoutAliases;
     std::map<std::string, std::vector<OrderingEntry>> orderings;
+    std::vector<Array> arrays;  // optional speaker groupings (SPEC §2.4)
 
     // Load + validate. Throws ParseError on malformed YAML or validation failure
     // (message lists every problem). Use parseUnchecked()+validate() to inspect.
@@ -127,6 +138,10 @@ public:
     std::vector<Speaker> order(const std::string& spec) const;
 
     std::vector<std::size_t> lfeIndices() const;
+
+    const Array* arrayById(const std::string& id) const;
+    // The array a speaker (by id) belongs to, or nullptr — a speaker is in one at most.
+    const Array* arrayForSpeaker(const std::string& speakerId) const;
 
     // ---- Authoring -------------------------------------------------------
     // Serialise to .osls YAML. Validates first (SPEC §4) and throws ParseError

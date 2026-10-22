@@ -142,6 +142,38 @@ def validate_layout(path: str, schema_validator: Draft202012Validator, errs: Err
                 f"not a permutation of the speaker set ({len(oids)} entries vs {len(ids)} speakers)",
             )
 
+    # Rule 7 — arrays group existing speakers, all LFE (a sub array) or none; one array per speaker and per sp;
+    # a speaker at the array's sp (its principal) is a member.
+    lfe = {s["id"] for s in speakers if s.get("lfe")}
+    member_of: dict[str, str] = {}
+    array_sp: dict[str, str] = {}
+    array_ids = [a["id"] for a in doc.get("arrays") or []]
+    for aid in sorted({i for i in array_ids if array_ids.count(i) > 1}):
+        errs.add(f"{name}:arrays:{aid}", "duplicate array id")
+    for a in doc.get("arrays") or []:
+        where = f"{name}:arrays:{a['id']}"
+        known = [m for m in a["speakers"] if m in ids]
+        if 0 < sum(m in lfe for m in known) < len(known):
+            errs.add(where, "mixes LFE and non-LFE speakers (a sub array is all LFE)")
+        for m in a["speakers"]:
+            if m not in ids:
+                errs.add(where, f"references unknown speaker id {m}")
+            if m in member_of:
+                errs.add(where, f"speaker {m} is already in array {member_of[m]}")
+            else:
+                member_of[m] = a["id"]
+        if not a.get("sp"):
+            errs.add(where, "needs an sp — the position it stands in for")
+        else:
+            if a["sp"] in array_sp:
+                errs.add(where, f"sp {a['sp']} already used by array {array_sp[a['sp']]}")
+            else:
+                array_sp[a["sp"]] = a["id"]
+            # The principal: a speaker at the array's position is one of its members.
+            for s in speakers:
+                if s.get("sp") == a["sp"] and s["id"] not in a["speakers"]:
+                    errs.add(where, f"speaker {s['id']} is at the array's position {a['sp']}, so it must be a member")
+
     return doc
 
 

@@ -40,6 +40,7 @@ A purely custom layout may carry only geometry + a `native` ordering (inline `or
 | `speakers` | ✓ | Speaker[] | The geometry. **The list order is the layout's native channel order.** |
 | `aliases` | – | map | Layout-level true-alias map (`{ Lss: [Ls], Lrs: [Lsr] }`). May also be set per speaker. |
 | `orderings` | – | map | `spec → [speaker id…]`. `native` is implied by the `speakers` order; add `adm`, `iamf`, `mpegh`, etc. as needed. |
+| `arrays` | – | Array[] | Speakers grouped to stand in for one position (§2.4) — e.g. a cinema side-surround array. |
 
 ### 2.2 Speaker
 
@@ -82,6 +83,25 @@ orderings:
 
 **Spec-specific labels (edge case).** Some same-set layouts merely rename channels per spec (e.g. IAMF labels sides `SiL/SiR` where ADM uses `Lss/Rss`). For those, an ordering entry (inline or in a profile's `order` array) may be an object instead of a bare sp: `{ sp: "M+090", label: "SiL" }`. v1 keeps the bare-sp/id form as the common case and the object form as the documented escape hatch.
 
+### 2.4 Arrays
+
+An **array** is a set of speakers that together stand in for one position — the way a cinema rig puts three or more speakers on each side wall to play the side-surround channel. Which speakers belong together is a fact about the room, so it lives in the layout. What plays through an array, and at what level, does not: that is the consuming renderer's business (see "What OSLS is *not*").
+
+| Field | Req | Type | Meaning |
+|---|---|---|---|
+| `id` | ✓ | string | Layout-local stable key, unique among the layout's arrays. |
+| `name` | ✓ | string | Display name (`"Left rear"`). |
+| `sp` | ✓ | string | **ITU-R BS.2051 SP-label** of the position the array stands in for (`M+135` = rear surround). This is how a consumer knows the array replaces that position — by identity, never by guessing from speaker names. |
+| `speakers` | ✓ | string[] | Member speaker `id`s, two or more. |
+
+```yaml
+arrays:
+  - { id: left-side,  name: "Left side",  sp: M+090, speakers: [Lss1, Lss2, Lss3] }
+  - { id: left-rear,  name: "Left rear",  sp: M+135, speakers: [Lrs1, Lrs2, Lrs3] }
+```
+
+A speaker belongs to **one array at most**, and no two arrays stand in for the same `sp` (§4 rule 7). If the layout has a speaker at the array's `sp` — the **principal**, as when a 7.1.4 room adds speakers beside its `Lrs` — that speaker is a member: one position never plays through both a lone speaker and an array. A rig with no speaker at that position (`Lrs1`–`Lrs3` and no `Lrs`) has no principal. An array is all LFE speakers — a **sub array**, standing in for `LFE1` — or has none: subs and main speakers never share one. Arrays add nothing to `orderings`: every member is still an ordinary speaker with its own channel. The blessed layouts carry no arrays — each of their positions is a single speaker.
+
 ## Profiles (per-format channel orders)
 
 Spec-mandated channel orders live in `profiles/<format>.json`, one file per delivery format, keyed by
@@ -112,6 +132,8 @@ The SDK MUST validate before accepting a layout. Rules:
 4. **LFE rules** — `lfe` speakers carry no positional contribution to panning; a layout may have 0..N LFEs; LFEs still appear in orderings (specs place them differently).
 5. **Identity sanity** — distinct physical positions must not collapse to the same `sp` (e.g. side `M+090` ≠ wide `M+060`); aliases must be true aliases, never cross-position.
 6. **Profiles** are checked against the standard orders, and every blessed layout must project completely (`missing === []`) for each format that defines it (the conformance test in CI). A profile entry whose `order` array omits a speaker that the rig carries — or adds a position the rig lacks — fails the build, so the profiles are the always-correct, conformance-gated source of format order.
+
+7. **Arrays** (§2.4) — unique array `id`s and a non-empty `name`; at least two members; every member references an existing speaker `id` and appears in one array only (and once within it); the members are all LFE or none; a non-empty `sp`, shared by no other array; any speaker whose `sp` is the array's is a member.
 
 Validation failures return structured errors (path + reason), never silent acceptance.
 

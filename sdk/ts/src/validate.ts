@@ -81,6 +81,44 @@ export function semanticCheck(layout: LayoutData): ValidationIssue[] {
     }
   }
 
+  // Rule 7 — arrays group existing speakers, all LFE (a sub array) or none; one array per speaker and per sp;
+  // a speaker at the array's sp (its principal) is a member.
+  const arrayIds = new Set<string>();
+  const memberOf = new Map<string, string>();
+  const arraySp = new Map<string, string>();
+  for (const a of layout.arrays ?? []) {
+    const p = `arrays.${a.id}`;
+    if (arrayIds.has(a.id)) err(p, `duplicate array id "${a.id}"`);
+    arrayIds.add(a.id);
+    if (!a.name) err(p, "array has an empty name");
+    if (a.speakers.length < 2) err(p, "an array needs at least 2 speakers");
+    let lfeMembers = 0;
+    let known = 0;
+    for (const m of a.speakers) {
+      const s = layout.speakers.find((x) => x.id === m);
+      if (!s) err(p, `references unknown speaker "${m}"`);
+      else {
+        known++;
+        if (s.isLFE) lfeMembers++;
+      }
+      const owner = memberOf.get(m);
+      if (owner === undefined) memberOf.set(m, a.id);
+      else if (owner === a.id) err(p, `lists speaker "${m}" twice`);
+      else err(p, `speaker "${m}" is already in array "${owner}"`);
+    }
+    if (lfeMembers > 0 && lfeMembers < known) err(p, "mixes LFE and non-LFE speakers (a sub array is all LFE)");
+    if (!a.sp) err(p, "an array needs an sp — the position it stands in for");
+    else {
+      const owner = arraySp.get(a.sp);
+      if (owner !== undefined) err(p, `sp "${a.sp}" already used by array "${owner}"`);
+      else arraySp.set(a.sp, a.id);
+      // The principal: a speaker at the array's position is one of its members.
+      for (const s of layout.speakers)
+        if (s.sp === a.sp && !a.speakers.includes(s.id))
+          err(p, `speaker "${s.id}" is at the array's position ${a.sp}, so it must be a member`);
+    }
+  }
+
   // Soft warning — an LFE carrying height is unusual (not an error).
   for (const s of layout.speakers) {
     if (s.isLFE && Math.abs(s.cartesian.z) > 0.2) {

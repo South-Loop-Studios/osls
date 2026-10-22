@@ -56,3 +56,19 @@ test("emitting an invalid layout rejects", async () => {
     const bad = new Layout({ id: "x", name: "x" }); // no speakers
     await assert.rejects(() => bad.toOSLS());
 });
+
+test("arrays round-trip and validate (SPEC §2.4)", async () => {
+    const dub = new Layout({ id: "dub", name: "Dub" });
+    dub.speakers = [
+        speaker.cartesian("Lrs1", { x: -1, y: -0.5, z: 0 }),
+        speaker.cartesian("Lrs2", { x: -0.8, y: -1, z: 0 }),
+        speaker.cartesian("Lrs3", { x: -0.3, y: -1, z: 0 }),
+    ];
+    dub.arrays = [{ id: "left-rear", name: "Left rear", sp: "M+135", speakers: ["Lrs1", "Lrs2", "Lrs3"] }];
+    const r = await OSLS.parse(await dub.toOSLS());
+    assert.deepEqual(r.arrays, dub.arrays);
+    assert.equal(r.arrayFor("Lrs2")?.id, "left-rear");
+
+    dub.arrays[0].speakers = ["Lrs1"]; // one member is not an array
+    await assert.rejects(() => dub.toOSLS());
+});

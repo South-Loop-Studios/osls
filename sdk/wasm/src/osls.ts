@@ -73,6 +73,9 @@ export const speaker = {
     },
 };
 
+/** Speakers that together stand in for one position (SPEC §2.4). */
+export interface SpeakerArray { id: string; name: string; sp: string; speakers: string[]; }
+
 // MARK: Layout
 
 export class Layout {
@@ -85,6 +88,8 @@ export class Layout {
     speakers: Speaker[] = [];
     /** spec name -> channel order as speaker ids ("native" is implied by `speakers`). */
     orderings: Record<string, string[]> = {};
+    /** Optional speaker groupings (SPEC §2.4). */
+    arrays: SpeakerArray[] = [];
 
     constructor(init?: { id?: string; name?: string; vendor?: string; description?: string }) {
         if (init) Object.assign(this, init);
@@ -106,6 +111,11 @@ export class Layout {
             ?? this.speakers.find((s) => s.sp !== "" && s.sp === token)
             ?? this.speakers.find((s) => s.label === token)
             ?? this.speakers.find((s) => s.aliases.includes(token));
+    }
+
+    /** The array a speaker (by id) belongs to — a speaker is in one at most. */
+    arrayFor(speakerId: string): SpeakerArray | undefined {
+        return this.arrays.find((a) => a.speakers.includes(speakerId));
     }
 
     static async parse(text: string): Promise<Layout> {
@@ -145,6 +155,10 @@ export class Layout {
             }
             for (const spec of Object.keys(this.orderings).sort())
                 for (const id of this.orderings[spec]) m.ccall("osls_ordering_add", null, ["number", "string", "string"], [h, spec, id]);
+            for (const a of this.arrays) {
+                const ai = m.ccall("osls_add_array", "number", ["number", "string", "string", "string"], [h, a.id, a.name, a.sp]) as number;
+                for (const id of a.speakers) m.ccall("osls_array_add_speaker", null, ["number", "number", "string"], [h, ai, id]);
+            }
 
             const errPtr = m._malloc(1024);
             try {
@@ -207,6 +221,22 @@ function readLayout(m: OSLSModule, h: number): Layout {
                 }
             }
         } finally { m._free(idxPtr); }
+    }
+
+    const arrN = m.ccall("osls_array_count", "number", ["number"], [h]) as number;
+    for (let a = 0; a < arrN; a++) {
+        const memberN = m.ccall("osls_array_speaker_count", "number", ["number", "number"], [h, a]) as number;
+        const speakers: string[] = [];
+        for (let j = 0; j < memberN; j++) {
+            const si = m.ccall("osls_array_speaker", "number", ["number", "number", "number"], [h, a, j]) as number;
+            speakers.push(m.ccall("osls_speaker_id", "string", ["number", "number"], [h, si]) as string);
+        }
+        L.arrays.push({
+            id: m.ccall("osls_array_id", "string", ["number", "number"], [h, a]) as string,
+            name: m.ccall("osls_array_name", "string", ["number", "number"], [h, a]) as string,
+            sp: m.ccall("osls_array_sp", "string", ["number", "number"], [h, a]) as string,
+            speakers,
+        });
     }
     return L;
 }

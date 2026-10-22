@@ -65,6 +65,22 @@ final class OSLSTests: XCTestCase {
         XCTAssertEqual(r.speaker("C")?.cartesian.y ?? 0, 1.0, accuracy: 1e-6)
     }
 
+    func testArraysRoundTrip() throws {
+        var l = Layout(id: "dub", name: "Dub")
+        l.speakers = [
+            .cartesian("Lrs1", x: -1, y: -0.5, z: 0),
+            .cartesian("Lrs2", x: -0.8, y: -1, z: 0),
+            .cartesian("Lrs3", x: -0.3, y: -1, z: 0),
+        ]
+        l.arrays = [SpeakerArray(id: "left-rear", name: "Left rear", sp: "M+135", speakers: ["Lrs1", "Lrs2", "Lrs3"])]
+        let r = try OSLS.parse(try l.toOSLS())
+        XCTAssertEqual(r.arrays, l.arrays)
+        XCTAssertEqual(r.array(for: "Lrs2")?.id, "left-rear")
+
+        l.arrays[0].speakers = ["Lrs1"]  // one member is not an array
+        XCTAssertThrowsError(try l.toOSLS())
+    }
+
     func testInvalidLayoutThrows() {
         let l = Layout(id: "x", name: "x")  // no speakers
         XCTAssertThrowsError(try l.toOSLS())

@@ -40,6 +40,16 @@ export function serializeLayout(layout: LayoutData, frame: WriteFrame = "asAutho
     }
   }
 
+  if (layout.arrays?.length) {
+    lines.push("arrays:");
+    for (const a of layout.arrays) {
+      const parts = [`id: ${scalar(a.id)}`, `name: ${scalar(a.name)}`];
+      if (a.sp) parts.push(`sp: ${scalar(a.sp)}`);
+      parts.push(`speakers: [${a.speakers.map(scalar).join(", ")}]`);
+      lines.push(`  - { ${parts.join(", ")} }`);
+    }
+  }
+
   return lines.join("\n") + "\n";
 }
 

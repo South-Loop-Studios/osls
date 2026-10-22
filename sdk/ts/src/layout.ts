@@ -2,7 +2,7 @@ import { cartesianToPolar, polarToCartesian } from "./geometry";
 import { serializeLayout } from "./serialize";
 import { profileOrder, formatsForLayout, spOf, labelOf } from "./profiles";
 import { detectFrame } from "./frame";
-import type { Frame, LayoutData, Ordering, Spec, Speaker, WriteFrame } from "./types";
+import type { Frame, LayoutData, Ordering, Spec, Speaker, SpeakerArray, WriteFrame } from "./types";
 import type { RawOsls, RawSpeaker } from "./raw";
 
 // The Layout class — mirrors @orbitspatial/osls-core's Layout (sdk/wasm/src/osls.ts:78).
@@ -20,6 +20,7 @@ export class Layout implements LayoutData {
   speakers: Speaker[] = [];
   orderings: Record<string, string[]> = {};
   orderingLabels?: Record<string, Record<string, string>>;
+  arrays: SpeakerArray[] = [];
 
   constructor(init?: { id?: string; name?: string; vendor?: string; description?: string }) {
     if (init) Object.assign(this, init);
@@ -97,6 +98,11 @@ export class Layout implements LayoutData {
     );
   }
 
+  /** The array a speaker (by id) belongs to — a speaker is in one at most. */
+  arrayFor(speakerId: string): SpeakerArray | undefined {
+    return this.arrays.find((a) => a.speakers.includes(speakerId));
+  }
+
   /** A plain, deep-cloned snapshot for the store / history. */
   toData(): LayoutData {
     return structuredClone({
@@ -110,6 +116,7 @@ export class Layout implements LayoutData {
       speakers: this.speakers,
       orderings: this.orderings,
       orderingLabels: this.orderingLabels,
+      arrays: this.arrays,
     });
   }
 
@@ -126,6 +133,7 @@ export class Layout implements LayoutData {
     l.speakers = clone.speakers;
     l.orderings = clone.orderings;
     l.orderingLabels = clone.orderingLabels;
+    l.arrays = clone.arrays ?? [];
     return l;
   }
 
@@ -160,6 +168,13 @@ export class Layout implements LayoutData {
         }
       }
     }
+
+    l.arrays = (raw.arrays ?? []).map((a) => ({
+      id: a.id,
+      name: a.name,
+      sp: a.sp ?? "",
+      speakers: [...a.speakers],
+    }));
 
     return l;
   }

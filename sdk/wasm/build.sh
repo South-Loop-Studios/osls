@@ -9,7 +9,7 @@ out="$here/dist"
 mkdir -p "$out"
 
 # C ABI symbols the JS facade calls (extern "C", so no name mangling) + malloc/free.
-exports='_osls_load_string,_osls_free,_osls_id,_osls_name,_osls_description,_osls_vendor,_osls_tag_count,_osls_tag,_osls_channel_count,_osls_speaker_id,_osls_speaker_label,_osls_speaker_sp,_osls_speaker_is_lfe,_osls_speaker_position,_osls_speaker_alias_count,_osls_speaker_alias,_osls_spec_count,_osls_spec_name,_osls_order_for_spec,_osls_resolve,_osls_new,_osls_set_id,_osls_set_name,_osls_set_description,_osls_set_vendor,_osls_add_tag,_osls_add_speaker,_osls_speaker_add_alias,_osls_ordering_add,_osls_to_yaml,_osls_string_free,_malloc,_free'
+exports='_osls_load_string,_osls_free,_osls_id,_osls_name,_osls_description,_osls_vendor,_osls_tag_count,_osls_tag,_osls_channel_count,_osls_speaker_id,_osls_speaker_label,_osls_speaker_sp,_osls_speaker_is_lfe,_osls_speaker_position,_osls_speaker_alias_count,_osls_speaker_alias,_osls_spec_count,_osls_spec_name,_osls_order_for_spec,_osls_resolve,_osls_new,_osls_set_id,_osls_set_name,_osls_set_description,_osls_set_vendor,_osls_add_tag,_osls_add_speaker,_osls_speaker_add_alias,_osls_ordering_add,_osls_array_count,_osls_array_id,_osls_array_name,_osls_array_sp,_osls_array_speaker_count,_osls_array_speaker,_osls_speaker_array,_osls_add_array,_osls_array_add_speaker,_osls_to_yaml,_osls_string_free,_malloc,_free'
 
 emcc \
   "$root/sdk/core/src/yaml.cpp" \

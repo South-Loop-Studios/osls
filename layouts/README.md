@@ -19,10 +19,12 @@ live anywhere your app looks; these are just the curated standards.
 | [`classic-quad`](./classic-quad.osls) | Quad (classic corner square) | 4 | 0 | 0 | **4** | adm |
 | [`3.1.2`](./3.1.2.osls) | 3.1.2 | 3 | 1 | 2 | **6** | adm, iamf |
 | [`5.1`](./5.1.osls) | 5.1 | 5 | 1 | 0 | **6** | adm, iamf |
-| [`5.1.2`](./5.1.2.osls) | 5.1.2 | 5 | 1 | 2 | **8** | adm, iamf |
+| [`5.1.2`](./5.1.2.osls) | 5.1.2 (Side Tops) | 5 | 1 | 2 | **8** | adm, iamf |
+| [`5.1.2-front-tops`](./5.1.2-front-tops.osls) | 5.1.2 (Front Tops) | 5 | 1 | 2 | **8** | adm, iamf |
 | [`5.1.4`](./5.1.4.osls) | 5.1.4 | 5 | 1 | 4 | **10** | adm, iamf |
 | [`7.1`](./7.1.osls) | 7.1 | 7 | 1 | 0 | **8** | adm, iamf |
-| [`7.1.2`](./7.1.2.osls) | 7.1.2 | 7 | 1 | 2 | **10** | adm, iamf |
+| [`7.1.2`](./7.1.2.osls) | 7.1.2 (Side Tops) | 7 | 1 | 2 | **10** | adm, iamf |
+| [`7.1.2-front-tops`](./7.1.2-front-tops.osls) | 7.1.2 (Front Tops) | 7 | 1 | 2 | **10** | adm, iamf |
 | [`7.1.4`](./7.1.4.osls) | 7.1.4 | 7 | 1 | 4 | **12** | adm, iamf |
 | [`7.1.6`](./7.1.6.osls) | 7.1.6 | 7 | 1 | 6 | **14** | adm, iamf |
 | [`9.1.4`](./9.1.4.osls) | 9.1.4 | 9 | 1 | 4 | **14** | adm |
@@ -41,6 +43,11 @@ implied).
 - **Height pairs:** `.2` = top-middle (U±90); `.4` = top-front + top-back
   (U±45, U±135); `.6` = top-front + top-middle + top-back. `3.1.2` is the
   exception — a front-oriented soundbar layout, so its pair is top-front.
+- **Two 5.1.2s and two 7.1.2s.** `5.1.2` and `7.1.2` keep the usual home rig
+  (Side Tops, U±90). `5.1.2-front-tops` and `7.1.2-front-tops` carry the pair
+  the IAMF spec names for those loudspeaker_layouts: the front pair of 5.1.4 /
+  7.1.4 (Ltf/Rtf, U±45). A plain 5.1.2 or 7.1.2 channel file is front-top
+  unless its labels say otherwise.
 - **Front-wide 9.x** (`9.1.4`, `9.1.6-wide`) add front wides (Lw/Rw, M±60) and carry
   an ADM ordering only. IAMF's expanded 9.1.6 uses a different speaker set
   (centre-fill FLc/FRc) and would be a separate file.

@@ -1,7 +1,7 @@
 osls: 1
 id: "5.1.2"
-name: "5.1.2"
-description: "5.1 + 2 overhead (top-middle Ltm/Rtm at U±90). Single surround pair at ±110. Same rig, ADM and IAMF orderings."
+name: "5.1.2 (Side Tops)"
+description: "5.1 + 2 overhead at the sides (top-middle Ltm/Rtm at U±90), the usual home 5.1.2 rig. For the IAMF 5.1.2 loudspeaker_layout (top-front) see 5.1.2-front-tops. Single surround pair at ±110. Same rig, ADM and IAMF orderings."
 vendor: io.orbitspatial
 tags: [home, immersive]
 frame: egocentric

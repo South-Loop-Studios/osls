@@ -25,6 +25,13 @@ int main() {
     CHECK(formatsForLayout("quad") == std::vector<std::string>({"adm"}));
     CHECK(formatsForLayout("7.1.2") == std::vector<std::string>({"adm","iamf"}));
 
+    // The IAMF 7.1.2 / 5.1.2 loudspeaker_layouts are top-front; the side-top rigs keep U±90.
+    const auto* iamf712Front = orderForLayout("iamf", "7.1.2-front-tops");
+    CHECK(iamf712Front != nullptr && *iamf712Front == std::vector<std::string>({"M+030","M+000","M-030","M+090","M-090","M+135","M-135","U+045","U-045","LFE1"}));
+    const auto* iamf512Front = orderForLayout("iamf", "5.1.2-front-tops");
+    CHECK(iamf512Front != nullptr && *iamf512Front == std::vector<std::string>({"M+030","M+000","M-030","M+110","M-110","U+045","U-045","LFE1"}));
+    CHECK(formatsForLayout("7.1.2-front-tops") == std::vector<std::string>({"adm","iamf"}));
+
     if (failures) { std::cerr << failures << " failure(s)\n"; return 1; }
     std::cout << "test_profiles OK\n";
     return 0;

@@ -1,7 +1,7 @@
 osls: 1
 id: "7.1.2"
-name: "7.1.2"
-description: "7.1 + 2 overhead (top-middle Ltm/Rtm at U±90). Split side (±90) and rear (±135) surrounds. Same rig, ADM and IAMF orderings."
+name: "7.1.2 (Side Tops)"
+description: "7.1 + 2 overhead at the sides (top-middle Ltm/Rtm at U±90), the usual home 7.1.2 rig. For the IAMF 7.1.2 loudspeaker_layout (top-front) see 7.1.2-front-tops. Split side (±90) and rear (±135) surrounds. Same rig, ADM and IAMF orderings."
 vendor: io.orbitspatial
 tags: [home, immersive]
 frame: egocentric

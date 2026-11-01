@@ -1,0 +1,7 @@
+layout: "5.1.2-front-tops"
+file: layouts/5.1.2-front-tops.osls
+channels: 8
+lfe: [LFE1]
+orderings:
+  adm:  [M+030, M-030, M+000, LFE1, M+110, M-110, U+045, U-045]
+  iamf: [M+030, M+000, M-030, M+110, M-110, U+045, U-045, LFE1]
